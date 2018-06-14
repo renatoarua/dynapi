@@ -820,9 +820,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 			'nbf' => $currentTime,       // Not Before: Timestamp of when the token should start being considered valid. Should be equal to or greater than iat. In this case, the token will begin to be valid 10 seconds
 			'exp' => $expire,           // Expire: Timestamp of when the token should cease to be valid. Should be greater than iat and nbf. In this case, the token will expire 60 seconds after being issued.
 			'data' => [
-				'username'      =>  $this->username,
-				'roleLabel'    =>  $this->getRoleLabel(),
-				'lastLoginAt'   =>  $this->last_login_at,
+                'id'          =>  $this->id,
+				'username'    =>  $this->username,
+				'roleLabel'   =>  $this->getRoleLabel(),
+				'lastLoginAt' =>  $this->last_login_at,
 			]
 		], static::getHeaderToken());
 		// Set up id

@@ -49,7 +49,36 @@ $config = [
             'showScriptName' => false,
             'enableStrictParsing' => true,
             'rules' => [
+                //'utility' => 'utility/default/index',
                 'ping'  =>  'site/ping',
+                [
+                    'class'         => 'yii\rest\UrlRule',
+                    'controller'    => 'v1/project',
+                    'pluralize'     => false,
+                    'tokens' => [
+                        '{id}'             => '<id:\w+>',
+                        '{userId}'         => '<id:\d+>',
+                    ],
+                    'extraPatterns' => [
+                        'OPTIONS {id}'       => 'options',
+                        'GET index {userId}' => 'index',
+                    ],
+                ],
+                [
+                    'class'         => 'yii\rest\UrlRule',
+                    'controller'    => 'v1/machine',
+                    'pluralize'     => false,
+                    'tokens' => [
+                        '{id}'             => '<id:\w+>',
+                    ],
+                    'extraPatterns' => [
+                        'OPTIONS {id}'       => 'options',
+                        'GET execute'        => 'execute',
+                        'OPTIONS execute'    => 'options',
+                        'GET change'        => 'change',
+                        'OPTIONS change'    => 'options',
+                    ],
+                ],
                 [
 	                'class'         => 'yii\rest\UrlRule',
 	                'controller'    => 'v1/user',
@@ -158,6 +187,9 @@ $config = [
         'v1' => [
             'class' => 'app\modules\v1\Module',
         ],
+        /*'utility' => [
+            'class' => 'c006\utility\migration\Module',
+        ],*/
     ],
     'params' => $params,
 ];
@@ -173,6 +205,11 @@ if (YII_ENV_DEV) {
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
     ];
+
+    /*$config['bootstrap'][] = 'utility';
+    $config['modules']['utility'] = [
+        'class' => 'c006\utility\migration\Module',
+    ];*/
 }
 
 return $config;

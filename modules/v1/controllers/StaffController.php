@@ -275,14 +275,19 @@
 	     * @return array
 	     * @throws HttpException
 	     */
-        public function actionLogin(){
+        public function actionLogin() {
             $model = new LoginForm();
 
 	        $model->roles = [
 	            User::ROLE_ADMIN,
 	            User::ROLE_STAFF
 	        ];
-            if ($model->load(Yii::$app->request->post()) && $model->login()) {
+
+	        $params = Yii::$app->request->post();
+	        /*var_dump($params);
+	        die();*/
+
+            if ($model->load($params) && $model->login()) {
                 $user = $model->getUser();
                 $user->generateAccessTokenAfterUpdatingClientInfo(true);
 
