@@ -32,7 +32,7 @@ class Campbell extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['campbellId', 'machineId', 'initialSpin', 'finalSpin', 'steps', 'crsp'], 'required'],
+            [['campbellId', 'machineId'], 'required'],
             [['initialSpin', 'finalSpin', 'steps', 'crsp'], 'number'],
             [['campbellId', 'machineId'], 'string', 'max' => 21],
             [['campbellId'], 'unique'],

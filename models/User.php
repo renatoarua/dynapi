@@ -42,6 +42,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     const STATUS_DISABLED = 0;
     const STATUS_PENDING = 1;
     const STATUS_ACTIVE = 10;
+    const STATUS_TRIAL = 50;
 
     /** @var  string to store JSON web token */
     public $access_token;

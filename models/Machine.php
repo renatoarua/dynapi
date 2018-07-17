@@ -69,19 +69,20 @@ class Machine extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
-    public function fields() 
-    { 
-        $fields = parent::fields(); 
-        $fields[] = 'shaftsessions'; 
-        $fields[] = 'ribs'; 
-        $fields[] = 'discs'; 
-        $fields[] = 'rollerbearings'; 
-        $fields[] = 'journalbearings'; 
-        $fields[] = 'ves'; 
-        $fields[] = 'abs'; 
-        $fields[] = 'foundations'; 
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields[] = 'shaftsessions';
+        $fields[] = 'ribs';
+        $fields[] = 'discs';
+        $fields[] = 'rollerbearings';
+        $fields[] = 'journalbearings';
+        $fields[] = 'ves';
+        $fields[] = 'abs';
+        $fields[] = 'foundations';
 
-        $fields[] = 'campbell'; 
+        $fields[] = 'campbell';
+        $fields[] = 'criticalmap';
 
         return $fields; 
     }
@@ -99,7 +100,15 @@ class Machine extends \yii\db\ActiveRecord
      */
     public function getCampbell()
     {
-        return $this->hasOne(Campbell::className(), ['machineId' => 'machineId']);
+        return $this->hasMany(Campbell::className(), ['machineId' => 'machineId']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCriticalmap()
+    {
+        return $this->hasOne(Criticalmap::className(), ['machineId' => 'machineId']);
     }
 
     /**
@@ -179,7 +188,7 @@ class Machine extends \yii\db\ActiveRecord
      */
     public function getVes()
     {
-        return $this->hasMany(Ves::className(), ['machineId' => 'machineId']);
-            //->orderBy(['CAST(`position` AS SIGNED)'=>SORT_ASC]);
+        return $this->hasMany(Ves::className(), ['machineId' => 'machineId'])
+            ->orderBy(["CAST(SUBSTRING_INDEX(`position`, ' ', -1) AS DECIMAL(5,5))"=>SORT_ASC]);
     }
 }

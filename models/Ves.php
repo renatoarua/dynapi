@@ -7,12 +7,13 @@ use Yii;
 /**
  * This is the model class for table "ves".
  *
- * @property string $absId
+ * @property string $vesId
  * @property string $machineId
- * @property string $type
- * @property string $sheet
+ * @property string $position
  *
+ * @property Sheet[] $sheets
  * @property Machine $machine
+ * @property Vesrollerbearing[] $vesrollerbearings
  */
 class Ves extends \yii\db\ActiveRecord
 {
@@ -30,10 +31,10 @@ class Ves extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['absId', 'machineId', 'type', 'sheet'], 'required'],
-            [['absId', 'machineId'], 'string', 'max' => 21],
-            [['type', 'sheet'], 'string', 'max' => 3],
-            [['absId'], 'unique'],
+            [['vesId', 'machineId', 'position'], 'required'],
+            [['vesId', 'machineId'], 'string', 'max' => 21],
+            [['position'], 'string', 'max' => 15],
+            [['vesId'], 'unique'],
             [['machineId'], 'exist', 'skipOnError' => true, 'targetClass' => Machine::className(), 'targetAttribute' => ['machineId' => 'machineId']],
         ];
     }
@@ -44,11 +45,33 @@ class Ves extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'absId' => Yii::t('app', 'Abs ID'),
+            'vesId' => Yii::t('app', 'Ves ID'),
             'machineId' => Yii::t('app', 'Machine ID'),
-            'type' => Yii::t('app', 'Type'),
-            'sheet' => Yii::t('app', 'Sheet'),
+            'position' => Yii::t('app', 'Position'),
         ];
+    }
+
+    public function beforeValidate()
+    {
+        $this->position = sprintf('%e', (float)$this->position);
+        return parent::beforeValidate();
+    }
+
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields[] = 'sheet';
+        $fields[] = 'vesrollerbearings';
+
+        return $fields;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSheet()
+    {
+        return $this->hasOne(Sheet::className(), ['vesId' => 'vesId']);
     }
 
     /**
@@ -57,5 +80,13 @@ class Ves extends \yii\db\ActiveRecord
     public function getMachine()
     {
         return $this->hasOne(Machine::className(), ['machineId' => 'machineId']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVesrollerbearings()
+    {
+        return $this->hasMany(Vesrollerbearing::className(), ['vesId' => 'vesId']);
     }
 }

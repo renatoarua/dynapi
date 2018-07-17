@@ -31,11 +31,21 @@ class Journalbearing extends \yii\db\ActiveRecord
     {
         return [
             [['journalBearingId', 'machineId', 'position'], 'required'],
-            [['position'], 'number'],
-            [['journalBearingId', 'machineId'], 'string', 'max' => 21],
+            [['journalBearingId', 'machineId', 'position'], 'string', 'max' => 21],
             [['journalBearingId'], 'unique'],
             [['machineId'], 'exist', 'skipOnError' => true, 'targetClass' => Machine::className(), 'targetAttribute' => ['machineId' => 'machineId']],
         ];
+    }
+
+    public function fields()
+    {
+        $fields = parent::fields();
+        $fields[] = 'journalBearingId';
+        $fields[] = 'machineId';
+        $fields[] = 'position';
+        $fields[] = 'rotations';
+
+        return $fields;
     }
 
     /**
@@ -48,6 +58,13 @@ class Journalbearing extends \yii\db\ActiveRecord
             'machineId' => Yii::t('app', 'Machine ID'),
             'position' => Yii::t('app', 'Position'),
         ];
+    }
+
+    public function beforeValidate()
+    {
+        $this->position = sprintf('%e', (float)$this->position);
+
+        return parent::beforeValidate();
     }
 
     /**
@@ -63,6 +80,10 @@ class Journalbearing extends \yii\db\ActiveRecord
      */
     public function getRotations()
     {
-        return $this->hasMany(Rotation::className(), ['journalBearingId' => 'journalBearingId']);
+        $qry = $this->hasMany(Rotation::className(), ['journalBearingId' => 'journalBearingId'])
+            // ->orderBy(["CAST(SUBSTRING_INDEX(`speed`, ' ', -1) AS DECIMAL(5,5))"=>SORT_DESC]);
+            ->orderBy(["`speed`+0"=>SORT_ASC]);
+
+        return $qry;
     }
 }

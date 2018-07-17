@@ -13,6 +13,9 @@ use app\models\Journalbearing;
 use app\models\Abs;
 use app\models\Ves;
 use app\models\Foundation;
+use app\models\Rotation;
+
+use app\modules\v1\models\VesModel;
 
 use yii\base\Model;
 use yii\widgets\ActiveForm;
@@ -27,6 +30,7 @@ class MachineModel extends Model
 	private $_discs;
 	private $_rollerbearings;
 	private $_journalbearings;
+	private $_rotations;
 	private $_abs;
 	private $_ves;
 	private $_foundations;
@@ -66,21 +70,27 @@ class MachineModel extends Model
 				$error = true;
 			}
 		}
+		foreach ($this->journalbearings as $roll) {
+			if(!$roll->validate()) {
+				$error = true;
+			}
+		}
+		foreach ($this->rotations as $rot) {
+			if(!$rot->validate()) {
+				$error = true;
+			}
+		}
+		foreach ($this->ves as $vs) {
+			if(!$vs->validate()) {
+				$error = true;
+			}
+		}
 		foreach ($this->foundations as $fund) {
 			if(!$fund->validate()) {
 				$error = true;
 			}
 		}
-		/*if(!$this->journalbearing->validate()) {
-			$error = true;
-		}
-		if(!$this->abs->validate()) {
-			$error = true;
-		}
-		if(!$this->ves->validate()) {
-			$error = true;
-		}
-		if(!$this->foundation->validate()) {
+		/*if(!$this->abs->validate()) {
 			$error = true;
 		}*/
 
@@ -118,20 +128,21 @@ class MachineModel extends Model
 				$roll->save();
 			}
 
+			foreach ($this->journalbearings as $roll) {
+				$roll->save();
+			}
+
+			foreach ($this->ves as $vs) {
+				$vs->save();
+			}
+
 			foreach ($this->foundations as $fund) {
 				$fund->save();
 			}
 
-			/*$this->journalbearing->machineId = $this->machine->machineId;
-			$this->journalbearing->save();
-
-			$this->abs->machineId = $this->machine->machineId;
-			$this->abs->save();
-
-			$this->ves->machineId = $this->machine->machineId;
-			$this->ves->save();
-
-			$this->foundation->save();*/
+			foreach ($this->rotations as $rot) {
+				$rot->save();
+			}
 
 			$tx->commit();
 			return true;
@@ -191,6 +202,33 @@ class MachineModel extends Model
 			}
 		}
 
+		$this->_journalbearings = [];
+		$this->_rotations = [];
+		$journalpositions = [];
+		$last = -1;
+		foreach ($data['journalbearings'] as $roll) {
+			if ($last != $roll['position']) {
+				$last = $roll['position'];
+				$journalpositions[] = $last;
+			}
+		}
+
+		foreach ($journalpositions as $pos) {
+			$filtered = [];
+			$filtered = array_filter($data['journalbearings'], function ($value) use ($pos) {
+				return $value['position'] == $pos;
+			});
+
+			$this->setJournalbearings($filtered, $machineId);
+		}
+
+		$this->_ves = [];
+		foreach ($data['ves'] as $sve) {
+			$v = new VesModel();
+			$v->loadAll($sve, $machineId);
+			$this->setVes($v);
+		}
+
 		$this->_foundations = [];
 		foreach ($data['foundations'] as $fund) {
 			if(!empty($fund['mass'])) {
@@ -198,7 +236,7 @@ class MachineModel extends Model
 			}
 		}
 
-		var_dump($this->shaftsessions);
+		// var_dump($this->shaftsessions);
 	}
 
 	function sortByPosition($a, $b)
@@ -295,6 +333,54 @@ class MachineModel extends Model
 		}
 	}
 
+	public function getJournalbearings()
+	{
+		return $this->_journalbearings;
+	}
+
+	public function setJournalbearings($all, $machineId)
+	{
+		$model = array_values($all)[0];
+		if($model instanceof Journalbearing) {
+			$this->_journalbearings[] = $model;
+		} else if (is_array($model)) {
+			$this->_journalbearings[] = $this->createJournal($model, $machineId, $all);
+		}
+	}
+
+	public function getRotations()
+	{
+		return $this->_rotations;
+	}
+
+	public function setRotations($model, $journalBearingId)
+	{
+		if($model instanceof Rotation) {
+			$this->_rotations[] = $model;
+		} else if (is_array($model)) {
+			$this->_rotations[] = $this->createRotation($model, $journalBearingId);
+		}
+	}
+
+	public function addRotation($model)
+	{
+		$this->_rotations[] = $model;
+	}
+
+	public function getVes()
+	{
+		return $this->_ves;
+	}
+
+	public function setVes($model)
+	{
+		if($model instanceof VesModel) {
+			$this->_ves[] = $model;
+		} else if (is_array($model)) {
+			// $this->_ves[] = $this->createFoundation($model, $machineId);
+		}
+	}
+
 	public function getFoundations()
 	{
 		return $this->_foundations;
@@ -379,7 +465,7 @@ class MachineModel extends Model
 		$rib->machineId = $machineId;
 		$rib->ribId = RestUtils::generateId();
 
-		$rib->position = (float)$model['position'] / 1000
+		$rib->position = (float)$model['position'] / 1000;
 		$rib->number = (int)$model['number'];
 		$rib->webThickness = (float)$model['webThickness'] / 1000;
 		$rib->webDepth = (float)$model['webDepth'] / 1000;
@@ -418,18 +504,57 @@ class MachineModel extends Model
 		return $roll;
 	}
 
+	protected function createJournal($model, $machineId, $all)
+	{
+		$roll = new Journalbearing();
+		$roll->machineId = $machineId;
+		$roll->journalBearingId = RestUtils::generateId();
+
+		$roll->position = (float)$model['position'] / 1000;
+
+		$this->createRotations($all, $roll->journalBearingId);
+
+		return $roll;
+	}
+
+	protected function createRotations($models, $id)
+	{
+		foreach ($models as $model) {
+			$this->addRotation($this->createRotation($model, $id));
+		}
+	}
+
+	protected function createRotation($model, $id)
+	{
+
+		$rot = new Rotation();
+		$rot->rotationId = RestUtils::generateId();
+		$rot->journalBearingId = $id;
+		$rot->speed = $model['speed'];
+		$rot->kxx = $model['kxx'];
+		$rot->kxz = $model['kxz'];
+		$rot->kzx = $model['kzx'];
+		$rot->kzz = $model['kzz'];
+		$rot->cxx = $model['cxx'];
+		$rot->cxz = $model['cxz'];
+		$rot->czx = $model['czx'];
+		$rot->czz = $model['czz'];
+
+		return $rot;
+	}
+
 	protected function createFoundation($model, $machineId)
 	{
 		$roll = new Foundation();
 		$roll->machineId = $machineId;
 		$roll->foundationId = RestUtils::generateId();
 
-		$roll->position = (float)$model['position'] / 1000
-		$roll->mass = $model['mass']
-		$roll->kxx = $model['kxx']
-		$roll->kzz = $model['kzz']
-		$roll->cxx = $model['cxx']
-		$roll->czz = $model['czz']
+		$roll->position = (float)$model['position'] / 1000;
+		$roll->mass = $model['mass'];
+		$roll->kxx = $model['kxx'];
+		$roll->kzz = $model['kzz'];
+		$roll->cxx = $model['cxx'];
+		$roll->czz = $model['czz'];
 
 		return $roll;
 	}
@@ -490,6 +615,18 @@ class MachineModel extends Model
 
 		foreach ($this->rollerbearings as $key => $value) {
 			$arr[] = ['Rollerbearing'.$key => $value];
+		}
+
+		foreach ($this->journalbearings as $key => $value) {
+			$arr[] = ['Journalbearing'.$key => $value];
+		}
+
+		foreach ($this->rotations as $key => $value) {
+			$arr[] = ['Rotation'.$key => $value];
+		}
+
+		foreach ($this->ves as $key => $value) {
+			$arr[] = ['VesModel'.$key => $value];
 		}
 
 		foreach ($this->foundations as $key => $value) {
