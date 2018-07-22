@@ -100,7 +100,8 @@ class Machine extends \yii\db\ActiveRecord
      */
     public function getCampbell()
     {
-        return $this->hasMany(Campbell::className(), ['machineId' => 'machineId']);
+        return $this->hasMany(Campbell::className(), ['machineId' => 'machineId'])
+            ->orderBy(["initialSpin"=>SORT_DESC]);
     }
 
     /**
