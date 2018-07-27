@@ -16,14 +16,14 @@ use Yii;
  *
  * @property Machine $machine
  */
-class Campbell extends \yii\db\ActiveRecord
+class Resultcampbell extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'campbell';
+        return 'resultcampbell';
     }
 
     /**

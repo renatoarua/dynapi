@@ -216,13 +216,13 @@ class MachineController extends RestController
 
 	public function actionChange($id = null) {
 		/*$rows = (new \yii\db\Query())
-			->select(['shaftSessionId', 'position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'])
-			->from('shaftsession')
+			->select(['sectiOnId', 'position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'])
+			->from('section')
 			->all();
 
 		$conn = \Yii::$app->getDb();
 		foreach ($rows as $obj) {
-			$qry = "UPDATE `shaftsession` SET";
+			$qry = "UPDATE `section` SET";
 
 
 			$qry .= " `position`='" . sprintf("%e", (float)$obj['position']) . "',";
@@ -234,7 +234,7 @@ class MachineController extends RestController
 
 			$qry .= " `axialForce`='" . sprintf("%e", (float)$obj['axialForce']) . "',";
 			$qry .= " `magneticForce`='" . sprintf("%e", (float)$obj['magneticForce']) . "'";
-			$qry .= " WHERE `shaftSessionId` LIKE BINARY '" . $obj['shaftSessionId'] . "'";
+			$qry .= " WHERE `sectiOnId` LIKE BINARY '" . $obj['sectiOnId'] . "'";
 
 
 			echo "<pre>".$qry . "</pre>";

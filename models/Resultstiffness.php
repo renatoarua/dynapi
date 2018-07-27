@@ -17,14 +17,14 @@ use Yii;
  *
  * @property Machine $machine
  */
-class Criticalmap extends \yii\db\ActiveRecord
+class Resultstiffness extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'criticalmap';
+        return 'resultstiffness';
     }
 
     /**

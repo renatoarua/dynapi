@@ -47,21 +47,19 @@ class Sheetrotation extends \yii\db\ActiveRecord
         return [
             'sheetRotationId' => Yii::t('app', 'Sheet Rotation ID'),
             'sheetId' => Yii::t('app', 'Sheet ID'),
-            'thickness' => Yii::t('app', 'Thickness'),
             'meanRadius' => Yii::t('app', 'Mean Radius'),
+            'thickness' => Yii::t('app', 'Thickness'),
             'radius' => Yii::t('app', 'Radius'),
         ];
     }
 
     public function beforeValidate()
     {
-       $this->thickness = sprintf('%e', (float)$this->thickness);
-       $this->meanRadius = sprintf('%e', (float)$this->meanRadius);
-       $this->radius = sprintf('%e', (float)$this->radius);
-       // $this->thickAngle = sprintf('%e', (float)$this->thickAngle);
-       // $this->lengthAngle = sprintf('%e', (float)$this->lengthAngle);
+        $this->thickness = sprintf('%e', (float)$this->thickness);
+        $this->meanRadius = sprintf('%e', (float)$this->meanRadius);
+        $this->radius = sprintf('%e', (float)$this->radius);
 
-       return parent::beforeValidate();
+        return parent::beforeValidate();
     }
 
     /**

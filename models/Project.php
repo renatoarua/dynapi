@@ -67,7 +67,7 @@ class Project extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        $fields[] = 'machines';
+        $fields[] = 'machine';
         $fields[] = 'user';
         $fields[] = 'projectsetting';
         return $fields;
@@ -110,9 +110,9 @@ class Project extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getMachines()
+    public function getMachine()
     {
-        return $this->hasMany(Machine::className(), ['projectId' => 'projectId']);
+        return $this->hasOne(Machine::className(), ['projectId' => 'projectId']);
     }
 
     /**

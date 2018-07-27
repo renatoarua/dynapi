@@ -5,9 +5,9 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "shaftsession".
+ * This is the model class for table "section".
  *
- * @property string $shaftSessionId
+ * @property string $sectionId
  * @property string $machineId
  * @property int $materialId
  * @property string $position
@@ -21,14 +21,14 @@ use Yii;
  *
  * @property Machine $machine
  */
-class Shaftsession extends \yii\db\ActiveRecord
+class Section extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'shaftsession';
+        return 'section';
     }
 
     /**
@@ -37,11 +37,11 @@ class Shaftsession extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['shaftSessionId', 'machineId', 'materialId', 'position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'], 'required'],
+            [['sectiOnId', 'machineId', 'materialId', 'position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'], 'required'],
             [['materialId'], 'integer'],
-            [['shaftSessionId', 'machineId'], 'string', 'max' => 21],
+            [['sectiOnId', 'machineId'], 'string', 'max' => 21],
             [['position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'], 'string', 'max' => 15],
-            [['shaftSessionId'], 'unique'],
+            [['sectiOnId'], 'unique'],
             [['machineId'], 'exist', 'skipOnError' => true, 'targetClass' => Machine::className(), 'targetAttribute' => ['machineId' => 'machineId']],
         ];
     }
@@ -52,7 +52,7 @@ class Shaftsession extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'shaftSessionId' => Yii::t('app', 'Shaft Session ID'),
+            'sectiOnId' => Yii::t('app', 'Shaft Section ID'),
             'machineId' => Yii::t('app', 'Machine ID'),
             'materialId' => Yii::t('app', 'Material ID'),
             'position' => Yii::t('app', 'Position'),

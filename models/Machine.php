@@ -18,10 +18,10 @@ use Yii;
  * @property Foundation[] $foundations
  * @property Journalbearing[] $journalbearings
  * @property Project $project
- * @property Resultline[] $resultlines
+ * @property Resultline[] $resultline
  * @property Ribs[] $ribs
  * @property Rollerbearing[] $rollerbearings
- * @property Shaftsession[] $shaftsessions
+ * @property Section[] $sections
  * @property Ves[] $ves
  */
 class Machine extends \yii\db\ActiveRecord
@@ -72,7 +72,7 @@ class Machine extends \yii\db\ActiveRecord
     public function fields()
     {
         $fields = parent::fields();
-        $fields[] = 'shaftsessions';
+        $fields[] = 'sections';
         $fields[] = 'ribs';
         $fields[] = 'discs';
         $fields[] = 'rollerbearings';
@@ -81,8 +81,9 @@ class Machine extends \yii\db\ActiveRecord
         $fields[] = 'abs';
         $fields[] = 'foundations';
 
-        $fields[] = 'campbell';
-        $fields[] = 'criticalmap';
+        $fields[] = 'resultcampbell';
+        $fields[] = 'resultstiffness';
+        //$fields[] = 'resultline';
 
         return $fields; 
     }
@@ -98,18 +99,18 @@ class Machine extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCampbell()
+    public function getResultcampbell()
     {
-        return $this->hasMany(Campbell::className(), ['machineId' => 'machineId'])
+        return $this->hasMany(Resultcampbell::className(), ['machineId' => 'machineId'])
             ->orderBy(["initialSpin"=>SORT_DESC]);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCriticalmap()
+    public function getResultstiffness()
     {
-        return $this->hasOne(Criticalmap::className(), ['machineId' => 'machineId']);
+        return $this->hasOne(Resultstiffness::className(), ['machineId' => 'machineId']);
     }
 
     /**
@@ -153,9 +154,9 @@ class Machine extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getResultlines()
+    public function getResultline()
     {
-        return $this->hasMany(Resultline::className(), ['machineId' => 'machineId']);
+        return $this->hasOne(Resultline::className(), ['machineId' => 'machineId']);
     }
 
     /**
@@ -178,9 +179,9 @@ class Machine extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getShaftsessions()
+    public function getSections()
     {
-        return $this->hasMany(Shaftsession::className(), ['machineId' => 'machineId'])
+        return $this->hasMany(Section::className(), ['machineId' => 'machineId'])
             ->orderBy(["CAST(SUBSTRING_INDEX(`position`, ' ', -1) AS DECIMAL(5,5))"=>SORT_ASC]);
     }
 

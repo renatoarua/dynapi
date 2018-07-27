@@ -5,7 +5,7 @@ namespace app\modules\v1\models;
 use Yii;
 
 use app\models\Machine;
-use app\models\Shaftsession;
+use app\models\Shaftsection;
 use app\models\Ribs;
 use app\models\Disc;
 use app\models\Rollerbearing;
@@ -25,7 +25,7 @@ use app\components\RestUtils;
 class MachineModel extends Model
 {
 	private $_machine;
-	private $_shaftsessions;
+	private $_section;
 	private $_ribs;
 	private $_discs;
 	private $_rollerbearings;
@@ -37,7 +37,7 @@ class MachineModel extends Model
 
 	public function rules()
 	{
-		// 'Shaftsession', 'Ribs', 'Disc', 'Rollerbearing'
+		// 'Shaftsection', 'Ribs', 'Disc', 'Rollerbearing'
 		// 'Journalbearing', 'Abs', 'Ves', 'Foundation'
 		return [
 			[['Machine'], 'required'],
@@ -50,8 +50,8 @@ class MachineModel extends Model
 		if(!$this->machine->validate()) {
 			$error = true;
 		}
-		foreach ($this->shaftsessions as $session) {
-			if(!$session->validate()) {
+		foreach ($this->section as $section) {
+			if(!$section->validate()) {
 				$error = true;
 			}
 		}
@@ -112,8 +112,8 @@ class MachineModel extends Model
 
 			$this->machine->save();
 
-			foreach ($this->shaftsessions as $session) {
-				$session->save();
+			foreach ($this->section as $section) {
+				$section->save();
 			}
 
 			foreach ($this->ribs as $rib) {
@@ -156,9 +156,9 @@ class MachineModel extends Model
 	public function update($data)
 	{
 		// parent::load($data, $formName);
-		/*$sessions = $data['sessions'];
-		usort($sessions, 'self::sortByPosition');
-		$length = (float)(end($sessions)['length']) / 1000;
+		/*$sections = $data['sections'];
+		usort($sections, 'self::sortByPosition');
+		$length = (float)(end($sections)['length']) / 1000;
 		var_dump($length);*/
 		$machineId = $data['machineId'];
 		$this->machine = Machine::find()->where([
@@ -168,10 +168,10 @@ class MachineModel extends Model
 		$this->machine->length = (float)$data['length'] / 1000;
 		$this->machine->ldratio = $data['ldRatio'];
 
-		$this->_shaftsessions = [];
-		foreach ($data['sessions'] as $session) {
-			if(!empty($session['position'])) {
-				$this->setShaftsessions($session, $machineId);
+		$this->_section = [];
+		foreach ($data['sections'] as $section) {
+			if(!empty($section['position'])) {
+				$this->setSection($section, $machineId);
 			}
 		}
 
@@ -236,7 +236,7 @@ class MachineModel extends Model
 			}
 		}
 
-		// var_dump($this->shaftsessions);
+		// var_dump($this->section);
 	}
 
 	function sortByPosition($a, $b)
@@ -263,18 +263,18 @@ class MachineModel extends Model
 		}
 	}
 
-	public function getShaftsessions()
+	public function getSection()
 	{
-		return $this->_shaftsessions;
+		return $this->_section;
 	}
 
-	public function setShaftsessions($model, $machineId)
+	public function setSection($model, $machineId)
 	{
 		//$this->_ribs = $model;
-		if($model instanceof Shaftsession) {
-			$this->_shaftsessions[] = $model;
+		if($model instanceof Shaftsection) {
+			$this->_section[] = $model;
 		} else if (is_array($model)) {
-			$this->_shaftsessions[] = $this->createSession($model, $machineId);
+			$this->_section[] = $this->createSection($model, $machineId);
 		}
 	}
 
@@ -396,11 +396,11 @@ class MachineModel extends Model
 		}
 	}
 
-	protected function createSession($model, $machineId)
+	protected function createSection($model, $machineId)
 	{
-		$sess = new Shaftsession();
+		$sess = new Shaftsection();
 		$sess->machineId = $machineId;
-		$sess->shaftSessionId = RestUtils::generateId();
+		$sess->shaftSectionId = RestUtils::generateId();
 
 		$sess->materialId = (int)$model['materialId'];
 		$sess->position = (float)$model['position'] / 1000;
@@ -601,8 +601,8 @@ class MachineModel extends Model
 		$arr = [];
 		$arr[] = ['Machine' => $this->machine];
 
-		foreach ($this->shaftsessions as $key => $value) {
-			$arr[] = ['Session'.$key => $value];
+		foreach ($this->section as $key => $value) {
+			$arr[] = ['Section'.$key => $value];
 		}
 
 		foreach ($this->ribs as $key => $value) {
