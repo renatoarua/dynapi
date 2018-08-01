@@ -5,9 +5,9 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "rotation".
+ * This is the model class for table "journalrotation".
  *
- * @property string $rotationId
+ * @property string $journalrotationId
  * @property string $journalBearingId
  * @property double $speed
  * @property double $kxx
@@ -21,14 +21,14 @@ use Yii;
  *
  * @property Journalbearing $journalBearing
  */
-class Rotation extends \yii\db\ActiveRecord
+class Journalrotation extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'rotation';
+        return 'journalrotation';
     }
 
     /**
@@ -37,10 +37,10 @@ class Rotation extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['rotationId', 'journalBearingId', 'speed', 'kxx', 'kxz', 'kzx', 'kzz', 'cxx', 'cxz', 'czx', 'czz'], 'required'],
+            [['journalRotationId', 'journalBearingId', 'speed', 'kxx', 'kxz', 'kzx', 'kzz', 'cxx', 'cxz', 'czx', 'czz'], 'required'],
             [['speed', 'kxx', 'kxz', 'kzx', 'kzz', 'cxx', 'cxz', 'czx', 'czz'], 'string', 'max' => 15],
-            [['rotationId', 'journalBearingId'], 'string', 'max' => 21],
-            [['rotationId'], 'unique'],
+            [['journalrotationId', 'journalBearingId'], 'string', 'max' => 21],
+            [['journalrotationId'], 'unique'],
             // [['journalBearingId'], 'exist', 'skipOnError' => true, 'targetClass' => Journalbearing::className(), 'targetAttribute' => ['journalBearingId' => 'journalBearingId']],
         ];
     }
@@ -51,7 +51,7 @@ class Rotation extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'rotationId' => Yii::t('app', 'Rotation ID'),
+            'journalRotationId' => Yii::t('app', 'Journal Rotation ID'),
             'journalBearingId' => Yii::t('app', 'Journal Bearing ID'),
             'speed' => Yii::t('app', 'Speed'),
             'kxx' => Yii::t('app', 'Kxx'),

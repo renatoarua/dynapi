@@ -12,7 +12,7 @@ use Yii;
  * @property double $position
  *
  * @property Machine $machine
- * @property Rotation[] $rotations
+ * @property Journalrotation[] $journalrotations
  */
 class Journalbearing extends \yii\db\ActiveRecord
 {
@@ -43,7 +43,7 @@ class Journalbearing extends \yii\db\ActiveRecord
         $fields[] = 'journalBearingId';
         $fields[] = 'machineId';
         $fields[] = 'position';
-        $fields[] = 'rotations';
+        $fields[] = 'journalrotations';
 
         return $fields;
     }
@@ -78,9 +78,9 @@ class Journalbearing extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRotations()
+    public function getJournalrotations()
     {
-        $qry = $this->hasMany(Rotation::className(), ['journalBearingId' => 'journalBearingId'])
+        $qry = $this->hasMany(Journalrotation::className(), ['journalBearingId' => 'journalBearingId'])
             // ->orderBy(["CAST(SUBSTRING_INDEX(`speed`, ' ', -1) AS DECIMAL(5,5))"=>SORT_DESC]);
             ->orderBy(["`speed`+0"=>SORT_ASC]);
 

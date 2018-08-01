@@ -37,11 +37,11 @@ class Section extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['sectiOnId', 'machineId', 'materialId', 'position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'], 'required'],
+            [['sectionId', 'machineId', 'materialId', 'position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'], 'required'],
             [['materialId'], 'integer'],
-            [['sectiOnId', 'machineId'], 'string', 'max' => 21],
+            [['sectionId', 'machineId'], 'string', 'max' => 21],
             [['position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'], 'string', 'max' => 15],
-            [['sectiOnId'], 'unique'],
+            [['sectionId'], 'unique'],
             [['machineId'], 'exist', 'skipOnError' => true, 'targetClass' => Machine::className(), 'targetAttribute' => ['machineId' => 'machineId']],
         ];
     }
@@ -52,7 +52,7 @@ class Section extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'sectiOnId' => Yii::t('app', 'Shaft Section ID'),
+            'sectionId' => Yii::t('app', 'Shaft Section ID'),
             'machineId' => Yii::t('app', 'Machine ID'),
             'materialId' => Yii::t('app', 'Material ID'),
             'position' => Yii::t('app', 'Position'),
