@@ -71,6 +71,13 @@ class Foundation extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public function afterFind()
+    {
+        parent::afterFind();
+        Yii::$app->converter->refresh();
+        $this->position = sprintf('%e', (float)Yii::$app->converter->convert(+$this->position));
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

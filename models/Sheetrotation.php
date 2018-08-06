@@ -62,6 +62,15 @@ class Sheetrotation extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public function afterFind()
+    {
+        parent::afterFind();
+        Yii::$app->converter->refresh();
+        $this->thickness = sprintf('%e', (float)Yii::$app->converter->convert(+$this->thickness));
+        $this->meanRadius = sprintf('%e', (float)Yii::$app->converter->convert(+$this->meanRadius));
+        $this->radius = sprintf('%e', (float)Yii::$app->converter->convert(+$this->radius));
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

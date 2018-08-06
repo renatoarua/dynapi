@@ -5,7 +5,7 @@ namespace app\modules\v1\models;
 use Yii;
 
 use app\models\Machine;
-use app\models\Shaftsection;
+use app\models\Section;
 use app\models\Ribs;
 use app\models\Disc;
 use app\models\Rollerbearing;
@@ -13,7 +13,7 @@ use app\models\Journalbearing;
 use app\models\Abs;
 use app\models\Ves;
 use app\models\Foundation;
-use app\models\Rotation;
+use app\models\Journalrotation;
 
 use app\modules\v1\models\VesModel;
 
@@ -37,7 +37,7 @@ class MachineModel extends Model
 
 	public function rules()
 	{
-		// 'Shaftsection', 'Ribs', 'Disc', 'Rollerbearing'
+		// 'Section', 'Ribs', 'Disc', 'Rollerbearing'
 		// 'Journalbearing', 'Abs', 'Ves', 'Foundation'
 		return [
 			[['Machine'], 'required'],
@@ -271,7 +271,7 @@ class MachineModel extends Model
 	public function setSection($model, $machineId)
 	{
 		//$this->_ribs = $model;
-		if($model instanceof Shaftsection) {
+		if($model instanceof Section) {
 			$this->_section[] = $model;
 		} else if (is_array($model)) {
 			$this->_section[] = $this->createSection($model, $machineId);
@@ -355,7 +355,7 @@ class MachineModel extends Model
 
 	public function setRotations($model, $journalBearingId)
 	{
-		if($model instanceof Rotation) {
+		if($model instanceof Journalrotation) {
 			$this->_rotations[] = $model;
 		} else if (is_array($model)) {
 			$this->_rotations[] = $this->createRotation($model, $journalBearingId);
@@ -398,9 +398,9 @@ class MachineModel extends Model
 
 	protected function createSection($model, $machineId)
 	{
-		$sess = new Shaftsection();
+		$sess = new Section();
 		$sess->machineId = $machineId;
-		$sess->shaftSectionId = RestUtils::generateId();
+		$sess->sectionId = RestUtils::generateId();
 
 		$sess->materialId = (int)$model['materialId'];
 		$sess->position = (float)$model['position'] / 1000;
@@ -527,8 +527,8 @@ class MachineModel extends Model
 	protected function createRotation($model, $id)
 	{
 
-		$rot = new Rotation();
-		$rot->rotationId = RestUtils::generateId();
+		$rot = new Journalrotation();
+		$rot->journalRotationId = RestUtils::generateId();
 		$rot->journalBearingId = $id;
 		$rot->speed = $model['speed'];
 		$rot->kxx = $model['kxx'];
@@ -622,7 +622,7 @@ class MachineModel extends Model
 		}
 
 		foreach ($this->rotations as $key => $value) {
-			$arr[] = ['Rotation'.$key => $value];
+			$arr[] = ['Journalrotation'.$key => $value];
 		}
 
 		foreach ($this->ves as $key => $value) {

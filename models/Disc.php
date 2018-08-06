@@ -86,6 +86,17 @@ class Disc extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public function afterFind()
+    {
+        parent::afterFind();
+        Yii::$app->converter->refresh();
+        $this->position = sprintf('%e', (float)Yii::$app->converter->convert(+$this->position));
+        $this->externalDiameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->externalDiameter));
+        $this->internalDiameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->internalDiameter));
+        $this->thickness = sprintf('%e', (float)Yii::$app->converter->convert(+$this->thickness));
+        $this->length = sprintf('%e', (float)Yii::$app->converter->convert(+$this->length));
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

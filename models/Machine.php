@@ -69,6 +69,13 @@ class Machine extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public function afterFind()
+    {
+        parent::afterFind();
+        Yii::$app->converter->refresh();
+        $this->length = sprintf('%e', (float)Yii::$app->converter->convert(+$this->length));
+    }
+
     public function fields()
     {
         $fields = parent::fields();

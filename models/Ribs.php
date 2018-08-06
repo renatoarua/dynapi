@@ -70,6 +70,17 @@ class Ribs extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public function afterFind()
+    {
+        parent::afterFind();
+        Yii::$app->converter->refresh();
+        $this->position = sprintf('%e', (float)Yii::$app->converter->convert(+$this->position));
+        $this->webThickness = sprintf('%e', (float)Yii::$app->converter->convert(+$this->webThickness));
+        $this->webDepth = sprintf('%e', (float)Yii::$app->converter->convert(+$this->webDepth));
+        $this->flangeWidth = sprintf('%e', (float)Yii::$app->converter->convert(+$this->flangeWidth));
+        $this->flangeThick = sprintf('%e', (float)Yii::$app->converter->convert(+$this->flangeThick));
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

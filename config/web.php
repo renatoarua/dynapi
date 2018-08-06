@@ -3,7 +3,7 @@
 $params = require(__DIR__ . '/params.php');
 
 $config = [
-    'id' => 'basic',
+    'id' => 'dyntech',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'components' => [
@@ -56,12 +56,14 @@ $config = [
                     'controller'    => 'v1/project',
                     'pluralize'     => false,
                     'tokens' => [
-                        '{id}'             => '<id:\w+>',
-                        '{userId}'         => '<id:\d+>',
+                        '{id}'      => '<id:\w+>',
+                        '{userId}'  => '<id:\d+>',
+                        '{unit}'    => '<id:\w+>',
                     ],
                     'extraPatterns' => [
                         'OPTIONS {id}'       => 'options',
                         'GET index {userId}' => 'index',
+                        'GET view {unit}' => 'view',
                     ],
                 ],
                 [
@@ -180,6 +182,10 @@ $config = [
         ],
         'sse' => [
 	        'class' => \odannyc\Yii2SSE\LibSSE::class
+        ],
+        'converter' => [
+            'class' => 'app\components\Converter',
+            'ratio' => 1000
         ]
 
     ],

@@ -18,6 +18,7 @@ use yii\web\Request as WebRequest;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $email
+ * @property string $picture
  * @property string $unconfirmed_email
  * @property integer $confirmed_at
  * @property string $registration_ip
@@ -65,6 +66,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return [
             'username'          => Yii::t('app', 'Username'),
             'email'             => Yii::t('app', 'Email'),
+            'picture'           => Yii::t('app', 'Picture'),
             'registration_ip'   => Yii::t('app', 'Registration ip'),
             'unconfirmed_email' => Yii::t('app', 'New email'),
             'password'          => Yii::t('app', 'Password'),
@@ -95,6 +97,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'id',
             'username',
             'email',
+            'picture',
             'unconfirmed_email',
             'role',
             'role_label'    =>  function() {
@@ -226,6 +229,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             [['last_login_ip', 'registration_ip'], 'ip'],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DISABLED]],
+            ['picture', 'string', 'max' => 255],
 
             ['role', 'default', 'value' => self::ROLE_USER],
             ['role', 'in', 'range' => [self::ROLE_USER, self::ROLE_STAFF, self::ROLE_ADMIN]],
@@ -823,6 +827,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 			'data' => [
                 'id'          =>  $this->id,
 				'username'    =>  $this->username,
+                'picture'     =>  $this->picture,
 				'roleLabel'   =>  $this->getRoleLabel(),
 				'lastLoginAt' =>  $this->last_login_at,
 			]

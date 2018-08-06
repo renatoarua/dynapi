@@ -39,8 +39,8 @@ class Journalrotation extends \yii\db\ActiveRecord
         return [
             [['journalRotationId', 'journalBearingId', 'speed', 'kxx', 'kxz', 'kzx', 'kzz', 'cxx', 'cxz', 'czx', 'czz'], 'required'],
             [['speed', 'kxx', 'kxz', 'kzx', 'kzz', 'cxx', 'cxz', 'czx', 'czz'], 'string', 'max' => 15],
-            [['journalrotationId', 'journalBearingId'], 'string', 'max' => 21],
-            [['journalrotationId'], 'unique'],
+            [['journalRotationId', 'journalBearingId'], 'string', 'max' => 21],
+            [['journalRotationId'], 'unique'],
             // [['journalBearingId'], 'exist', 'skipOnError' => true, 'targetClass' => Journalbearing::className(), 'targetAttribute' => ['journalBearingId' => 'journalBearingId']],
         ];
     }

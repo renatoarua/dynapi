@@ -47,7 +47,7 @@ class Projectsetting extends \yii\db\ActiveRecord
         return [
             [['projectId'], 'required'],
             [['projectId'], 'string', 'max' => 21],
-            [['foundation', 'rollerbearing', 'journalbearing', 'ves', 'abs', 'staticLine', 'fatigue', 'campbell', 'modes', 'criticalMap', 'unbalancedResponse', 'constantResponse', 'timeResponse', 'torsional', 'balanceOptimization', 'vesOptimization', 'absOptimization'], 'string', 'max' => 1],
+            [['foundation', 'rollerbearing', 'journalbearing', 'ves', 'abs', 'staticLine', 'fatigue', 'campbell', 'modes', 'criticalMap', 'unbalancedResponse', 'constantResponse', 'timeResponse', 'torsional', 'balanceOptimization', 'vesOptimization', 'absOptimization'], 'boolean'],
             [['projectId'], 'exist', 'skipOnError' => false, 'targetClass' => Project::className(), 'targetAttribute' => ['projectId' => 'projectId']],
         ];
     }
@@ -78,6 +78,13 @@ class Projectsetting extends \yii\db\ActiveRecord
             'vesOptimization' => Yii::t('app', 'Ves Optimization'),
             'absOptimization' => Yii::t('app', 'Abs Optimization'),
         ];
+    }
+
+    public function afterFind()
+    {
+        parent::afterFind();
+        // $this->booleanField = ($this->booleanField === 1);
+        
     }
 
     /**

@@ -6,4 +6,5 @@ return [
     'adminEmail'    => 'admin@example.com',
     'jwtSecretCode' =>  'someSecretKey',
     'user.passwordResetTokenExpire' => 3600,
+    'ratio' => 1000,
 ];

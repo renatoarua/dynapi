@@ -80,6 +80,15 @@ class Section extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public function afterFind()
+    {
+        parent::afterFind();
+        Yii::$app->converter->refresh();
+        $this->position = sprintf('%e', (float)Yii::$app->converter->convert(+$this->position));
+        $this->externalDiameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->externalDiameter));
+        $this->internalDiameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->internalDiameter));
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

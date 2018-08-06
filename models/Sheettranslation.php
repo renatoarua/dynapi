@@ -62,6 +62,15 @@ class Sheettranslation extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public function afterFind()
+    {
+        parent::afterFind();
+        Yii::$app->converter->refresh();
+        $this->segments = sprintf('%e', (float)Yii::$app->converter->convert(+$this->segments));
+        $this->thickness = sprintf('%e', (float)Yii::$app->converter->convert(+$this->thickness));
+        $this->diameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->diameter));
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

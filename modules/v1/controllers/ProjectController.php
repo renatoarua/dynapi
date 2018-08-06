@@ -83,8 +83,10 @@ class ProjectController extends RestController
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function actionIndex($userId = null)
+	public function actionIndex($unit = 'mm', $userId = null)
 	{
+		Yii::$app->session->set('ratio', ($unit == 'm') ? 1 : 1000);
+		Yii::$app->converter->ratio = ($unit == 'm') ? 1 : 1000;
 		//$data = RestUtils::getQuery(\Yii::$app->request->get(), Project::find());
 		$models = array();
 
@@ -104,19 +106,23 @@ class ProjectController extends RestController
 	 * @return array|null|\yii\db\ActiveRecord
 	 * @throws NotFoundHttpException
 	 */
-	public function actionView($id)
+	public function actionView($id, $unit = 'mm')
 	{
+		Yii::$app->session->set('ratio', ($unit == 'm') ? 1 : 1000);
+		Yii::$app->converter->ratio = ($unit == 'm') ? 1 : 1000;
+
 		$project = Project::find()->where([
 			'projectId' => $id
 		])->one();
 		/*->andWhere([
 			'status' => 'ACT'
 		])*/
-		
+
 		/*var_dump($project);
 		die();*/
 
 		if($project) {
+			// Yii::$app->session->set('ratio', 1000);
 			return $project;
 		} else {
 			throw new NotFoundHttpException("Object not found: $id");
