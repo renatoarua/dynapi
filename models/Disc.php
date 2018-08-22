@@ -97,6 +97,12 @@ class Disc extends \yii\db\ActiveRecord
         $this->length = sprintf('%e', (float)Yii::$app->converter->convert(+$this->length));
     }
 
+    public static function findById($id)
+    {
+        $mod = static::findOne(['discId' => $id]);
+        return $mod;
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

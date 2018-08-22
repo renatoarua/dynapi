@@ -74,6 +74,12 @@ class Journalbearing extends \yii\db\ActiveRecord
         $this->position = sprintf('%e', (float)Yii::$app->converter->convert(+$this->position));
     }
 
+    public static function findById($id)
+    {
+        $mod = static::findOne(['journalBearingId' => $id]);
+        return $mod;
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

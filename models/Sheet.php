@@ -81,6 +81,13 @@ class Sheet extends \yii\db\ActiveRecord
         return $fields; 
     }
 
+    public function afterFind()
+    {
+        $t = ['translation', 'rotation', 'mixed'];
+        parent::afterFind();
+        // $this->type = array_search($this->type, $t);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

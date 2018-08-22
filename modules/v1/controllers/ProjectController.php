@@ -17,6 +17,7 @@ use yii\web\ServerErrorHttpException;
 
 use app\models\Project;
 use app\modules\v1\models\ProjectModel;
+use app\modules\v1\models\MachineModel;
 
 use yii\helpers\ArrayHelper;
 use app\components\RestUtils;
@@ -165,9 +166,13 @@ class ProjectController extends RestController
 	 * @throws HttpException
 	 */
 	public function actionUpdate($id) {
-		$model = $this->actionView($id);
+		$model = new MachineModel();
+		$params = \Yii::$app->getRequest()->getBodyParams();
+		$model->update($params['machine']);
 
-		$model->load(\Yii::$app->getRequest()->getBodyParams(), '');
+		// $model->validate();
+		/*var_dump($model->ves);
+		die();*/
 
 		if ($model->validate() && $model->save()) {
 			$response = \Yii::$app->getResponse();
@@ -177,7 +182,7 @@ class ProjectController extends RestController
 			throw new HttpException(422, json_encode($model->errors));
 		}
 
-		return $model;
+		return $this->actionView($id);
 	}
 
 	/**

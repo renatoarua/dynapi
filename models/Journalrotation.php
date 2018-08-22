@@ -80,6 +80,12 @@ class Journalrotation extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public static function findById($id)
+    {
+        $mod = static::findOne(['journalRotationId' => $id]);
+        return $mod;
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

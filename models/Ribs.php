@@ -81,6 +81,12 @@ class Ribs extends \yii\db\ActiveRecord
         $this->flangeThick = sprintf('%e', (float)Yii::$app->converter->convert(+$this->flangeThick));
     }
 
+    public static function findById($id)
+    {
+        $mod = static::findOne(['ribId' => $id]);
+        return $mod;
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

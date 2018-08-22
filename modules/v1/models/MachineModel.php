@@ -48,45 +48,54 @@ class MachineModel extends Model
 	{
 		$error = false;
 		if(!$this->machine->validate()) {
+			var_dump($this->machine->errors);
 			$error = true;
 		}
 		foreach ($this->section as $section) {
 			if(!$section->validate()) {
+				var_dump($section->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->ribs as $rib) {
 			if(!$rib->validate()) {
+				var_dump($rib->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->discs as $disc) {
 			if(!$disc->validate()) {
+				var_dump($disc->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->rollerbearings as $roll) {
 			if(!$roll->validate()) {
+				var_dump($roll->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->journalbearings as $roll) {
 			if(!$roll->validate()) {
+				var_dump($roll->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->rotations as $rot) {
 			if(!$rot->validate()) {
+				var_dump($rot->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->ves as $vs) {
 			if(!$vs->validate()) {
+				var_dump($ves->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->foundations as $fund) {
 			if(!$fund->validate()) {
+				var_dump($fund->errors);
 				$error = true;
 			}
 		}
@@ -166,7 +175,7 @@ class MachineModel extends Model
 		])->one();
 
 		$this->machine->length = (float)$data['length'] / 1000;
-		$this->machine->ldratio = $data['ldRatio'];
+		$this->machine->ldratio = $data['ldratio'];
 
 		$this->_section = [];
 		foreach ($data['sections'] as $section) {
@@ -184,7 +193,7 @@ class MachineModel extends Model
 
 		$this->_ribs = [];
 		foreach ($data['ribs'] as $rib) {
-			if(!empty($rib['position'])) {
+			if(!empty($rib['number'])) {
 				$this->setRibs($rib, $machineId);
 			}
 		}
@@ -207,8 +216,8 @@ class MachineModel extends Model
 		$journalpositions = [];
 		$last = -1;
 		foreach ($data['journalbearings'] as $roll) {
-			if ($last != $roll['position']) {
-				$last = $roll['position'];
+			if ($last != (float)$roll['position'] && !empty($roll['journalrotations']['speed'])) {
+				$last = (float)$roll['position'];
 				$journalpositions[] = $last;
 			}
 		}
@@ -224,9 +233,11 @@ class MachineModel extends Model
 
 		$this->_ves = [];
 		foreach ($data['ves'] as $sve) {
-			$v = new VesModel();
-			$v->loadAll($sve, $machineId);
-			$this->setVes($v);
+			if((!empty($sve['sheet']['translations']) || !empty($sve['sheet']['rotations']))) {
+				$v = new VesModel();
+				$v->loadAll($sve, $machineId);
+				$this->setVes($v);
+			}
 		}
 
 		$this->_foundations = [];
@@ -400,7 +411,10 @@ class MachineModel extends Model
 	{
 		$sess = new Section();
 		$sess->machineId = $machineId;
-		$sess->sectionId = RestUtils::generateId();
+		if($model['sectionId'] != '' && !empty($model['sectionId']))
+			$sess = Section::findById($model['sectionId']);
+		else 
+			$sess->sectionId = RestUtils::generateId();
 
 		$sess->materialId = (int)$model['materialId'];
 		$sess->position = (float)$model['position'] / 1000;
@@ -417,9 +431,15 @@ class MachineModel extends Model
 
 	protected function createDisc($model, $machineId)
 	{
+		if((float)$model['length'] > 0)
+			return $this->createInertia($model, $machineId);
+
 		$disc = new Disc();
 		$disc->machineId = $machineId;
-		$disc->discId = RestUtils::generateId();
+		if($model['discId'] != '' && !empty($model['discId']))
+			$disc = Disc::findById($model['discId']);
+		else
+			$disc->discId = RestUtils::generateId();
 
 		$disc->materialId = (int)$model['materialId'];
 		$disc->position = (float)$model['position'] / 1000;
@@ -441,7 +461,10 @@ class MachineModel extends Model
 	{
 		$disc = new Disc();
 		$disc->machineId = $machineId;
-		$disc->discId = RestUtils::generateId();
+		if($model['discId'] != '' && !empty($model['discId']))
+			$disc = Disc::findById($model['discId']);
+		else
+			$disc->discId = RestUtils::generateId();
 
 		$disc->materialId = 0;
 		$disc->externalDiameter = 0;
@@ -463,7 +486,10 @@ class MachineModel extends Model
 	{
 		$rib = new Ribs();
 		$rib->machineId = $machineId;
-		$rib->ribId = RestUtils::generateId();
+		if($model['ribId'] != '' && !empty($model['ribId']))
+			$rib = Ribs::findById($model['ribId']);
+		else
+			$rib->ribId = RestUtils::generateId();
 
 		$rib->position = (float)$model['position'] / 1000;
 		$rib->number = (int)$model['number'];
@@ -479,7 +505,10 @@ class MachineModel extends Model
 	{
 		$roll = new Rollerbearing();
 		$roll->machineId = $machineId;
-		$roll->rollerBearingId = RestUtils::generateId();
+		if($model['rollerBearingId'] != '' && !empty($model['rollerBearingId']))
+			$roll = Rollerbearing::findById($model['rollerBearingId']);
+		else
+			$roll->rollerBearingId = RestUtils::generateId();
 
 		$roll->position = (float)$model['position'] / 1000;
 		$roll->inertia = $model['inertia'];
@@ -508,7 +537,10 @@ class MachineModel extends Model
 	{
 		$roll = new Journalbearing();
 		$roll->machineId = $machineId;
-		$roll->journalBearingId = RestUtils::generateId();
+		if($model['journalBearingId'] != '' && !empty($model['journalBearingId']))
+			$roll = Journalbearing::findById($model['journalBearingId']);
+		else
+			$roll->journalBearingId = RestUtils::generateId();
 
 		$roll->position = (float)$model['position'] / 1000;
 
@@ -526,9 +558,12 @@ class MachineModel extends Model
 
 	protected function createRotation($model, $id)
 	{
-
 		$rot = new Journalrotation();
-		$rot->journalRotationId = RestUtils::generateId();
+		if($model['journalRotationId'] != '' && !empty($model['journalRotationId']))
+			$rot = Journalrotation::findById($model['journalRotationId']);
+		else
+			$rot->journalRotationId = RestUtils::generateId();
+
 		$rot->journalBearingId = $id;
 		$rot->speed = $model['speed'];
 		$rot->kxx = $model['kxx'];
@@ -547,7 +582,10 @@ class MachineModel extends Model
 	{
 		$roll = new Foundation();
 		$roll->machineId = $machineId;
-		$roll->foundationId = RestUtils::generateId();
+		if($model['foundationId'] != '' && !empty($model['foundationId']))
+			$roll = Foundation::findById($model['foundationId']);
+		else
+			$roll->foundationId = RestUtils::generateId();
 
 		$roll->position = (float)$model['position'] / 1000;
 		$roll->mass = $model['mass'];

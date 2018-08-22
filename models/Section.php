@@ -23,6 +23,8 @@ use Yii;
  */
 class Section extends \yii\db\ActiveRecord
 {
+    /*protected $area;
+    protected $border;*/
     /**
      * @inheritdoc
      */
@@ -80,6 +82,20 @@ class Section extends \yii\db\ActiveRecord
         return parent::beforeValidate();
     }
 
+    public static function findById($id)
+    {
+        $mod = static::findOne(['sectionId' => $id]);
+        return $mod;
+    }
+
+    /*public function fields()
+    {
+        $fields = parent::fields();
+        $fields[] = 'area';
+        $fields[] = 'border';
+        return $fields;
+    }*/
+
     public function afterFind()
     {
         parent::afterFind();
@@ -87,6 +103,19 @@ class Section extends \yii\db\ActiveRecord
         $this->position = sprintf('%e', (float)Yii::$app->converter->convert(+$this->position));
         $this->externalDiameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->externalDiameter));
         $this->internalDiameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->internalDiameter));
+        /*$length = (float)$this->position;
+        $x = 0;
+        $d = (float)$this->externalDiameter;
+        $y = -$d/2;
+        $path = "M$x,$y v$d h$length v-$d Z";
+        $this->area = ['d' => $path];
+        $this->border = [
+            'x' => $x,
+            'y' => $y,
+            'w' => $length,
+            'h' => $d
+        ];*/
+        // border: <NodeBorder>{ x: x, y: y, w: length, h: d }
     }
 
     /**

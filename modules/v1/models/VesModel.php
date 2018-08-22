@@ -36,28 +36,34 @@ class VesModel extends Model
 	{
 		$error = false;
 		if(!$this->ves->validate()) {
+			var_dump($this->ves->errors);
 			$error = true;
 		}
 		if(!$this->sheet->validate()) {
+			var_dump($this->sheet->errors);
 			$error = true;
 		}
 		foreach ($this->sheetmaterials as $mat) {
 			if(!$mat->validate()) {
+				var_dump($mat->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->sheetrotations as $rot) {
 			if(!$rot->validate()) {
+				var_dump($rot->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->sheettranslations as $tra) {
 			if(!$tra->validate()) {
+				var_dump($tra->errors);
 				$error = true;
 			}
 		}
 		foreach ($this->vesrollerbearings as $roll) {
 			if(!$roll->validate()) {
+				var_dump($roll->errors);
 				$error = true;
 			}
 		}
@@ -114,17 +120,21 @@ class VesModel extends Model
 	public function loadAll($data, $machineId)
 	{
 		$this->ves = new Ves();
-		$vesId = RestUtils::generateId();
+		if($data['vesId'] != '' && !empty($data['vesId']))
+			$vesId = $data['vesId'];
+		else
+			$vesId = RestUtils::generateId();
+
 		$this->ves->vesId = $vesId;
 		$this->ves->machineId = $machineId;
 		$this->ves->position = (float)$data['position'] / 1000;
 
-		$this->sheet = $this->createSheet($data);
+		$this->sheet = $this->createSheet($data['sheet']);
 		$sheetId = $this->sheet->sheetId;
 		// $this->sheet->vesId = $vesId;
 
 		$this->_sheetmaterials = [];
-		foreach ($data['materials'] as $mat) {
+		foreach ($data['sheet']['materials'] as $mat) {
 			if(!empty($mat['go'])) {
 				$this->setSheetmaterials($mat, $sheetId);
 			}
@@ -132,7 +142,7 @@ class VesModel extends Model
 
 		$inertia = 0;
 		$this->_sheetrotations = [];
-		foreach ($data['rotations'] as $rot) {
+		foreach ($data['sheet']['rotations'] as $rot) {
 			if(!empty($rot['thickness'])) {
 				$this->setSheetrotations($rot, $sheetId);
 			}
@@ -143,7 +153,7 @@ class VesModel extends Model
 
 		$mass = 0;
 		$this->_sheettranslations = [];
-		foreach ($data['translations'] as $tra) {
+		foreach ($data['sheet']['translations'] as $tra) {
 			if(!empty($tra['thickness'])) {
 				$this->setSheettranslations($tra, $sheetId);
 			}
@@ -153,7 +163,7 @@ class VesModel extends Model
 		}
 
 		$this->_vesrollerbearings = [];
-		foreach ($data['rollerbearings'] as $roll) {
+		foreach ($data['vesrollerbearings'] as $roll) {
 			if(!empty($roll['mass']) || (!empty($roll['inertia']))) {
 				$this->setVesrollerbearings($roll, $vesId);
 			}
@@ -255,7 +265,7 @@ class VesModel extends Model
 		// $shit->vesId = $vesId;
 		$shit->simple = (int)$model['simple'];
 		$shit->single = (int)$model['single'];
-		$shit->type = (int)$model['type'];
+		$shit->type = (int)$model['type']+1;
 		// $shit->doubled = (int)$model['doubled'];
 		// $shit->mass = (float)$model['mass'];
 		// $shit->inertia = (float)$model['inertia'];
@@ -267,7 +277,10 @@ class VesModel extends Model
 	{
 		$mat = new Sheetmaterial();
 		// $mat->sheetId = $sheetId;
-		$mat->sheetMaterialId = RestUtils::generateId();
+		if($model['sheetMaterialId'] != '' && !empty($model['sheetMaterialId']))
+			$mat = Sheetmaterial::findById($model['sheetMaterialId']);
+		else
+			$mat->sheetMaterialId = RestUtils::generateId();
 
 		$mat->go = (float)$model['go'];
 		$mat->goo = (float)$model['goo'];
@@ -285,12 +298,14 @@ class VesModel extends Model
 	{
 		$rot = new Sheetrotation();
 		// $rot->sheetId = $sheetId;
-		$rot->sheetRotationId = RestUtils::generateId();
+		if($model['sheetRotationId'] != '' && !empty($model['sheetRotationId']))
+			$mat->sheetRotationId = $model['sheetRotationId'];
+		else
+			$rot->sheetRotationId = RestUtils::generateId();
 
 		$rot->thickness = (float)$model['thickness'] / 1000;
 		$rot->meanRadius = (float)$model['meanRadius'] / 1000;
-		$rot->thickAngle = (float)$model['thickAngle'];
-		$rot->lengthAngle = (float)$model['lengthAngle'];
+		$rot->radius = (float)$model['radius'] / 1000;
 
 		return $rot;
 	}
@@ -299,7 +314,10 @@ class VesModel extends Model
 	{
 		$rot = new Sheettranslation();
 		// $rot->sheetId = $sheetId;
-		$rot->sheetTranslationId = RestUtils::generateId();
+		if($model['sheetTranslationId'] != '' && !empty($model['sheetTranslationId']))
+			$mat->sheetTranslationId = $model['sheetTranslationId'];
+		else
+			$rot->sheetTranslationId = RestUtils::generateId();
 
 		$rot->segments = (float)$model['segments'];
 		$rot->thickness = (float)$model['thickness'] / 1000;

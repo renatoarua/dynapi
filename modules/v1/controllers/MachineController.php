@@ -161,9 +161,8 @@ class MachineController extends RestController
 		$params = \Yii::$app->getRequest()->getBodyParams();
 
 		$model->update($params);
-		/*var_dump($model->ves[1]->errorList());
-		var_dump($model->errorList());
-		die();*/
+		var_dump($model);
+		die();
 
 		if ($model->validate() && $model->save()) {
 			$response = \Yii::$app->getResponse();
