@@ -88,9 +88,10 @@ class Machine extends \yii\db\ActiveRecord
         $fields[] = 'abs';
         $fields[] = 'foundations';
 
+        //$fields[] = 'resultline';
         $fields[] = 'resultcampbell';
         $fields[] = 'resultstiffness';
-        //$fields[] = 'resultline';
+        $fields[] = 'resultmodes';
 
         return $fields; 
     }
@@ -117,7 +118,12 @@ class Machine extends \yii\db\ActiveRecord
      */
     public function getResultstiffness()
     {
-        return $this->hasOne(Resultstiffness::className(), ['machineId' => 'machineId']);
+        return $this->hasMany(Resultstiffness::className(), ['machineId' => 'machineId']);
+    }
+
+    public function getResultmodes()
+    {
+        return $this->hasMany(Resultmodes::className(), ['machineId' => 'machineId']);
     }
 
     /**
