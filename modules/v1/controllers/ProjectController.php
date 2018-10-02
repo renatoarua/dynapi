@@ -109,6 +109,11 @@ class ProjectController extends RestController
 	 */
 	public function actionView($id, $unit = 'mm')
 	{
+		/*for ($i=0; $i < 100; $i++) { 
+			echo RestUtils::generateId() . "<br>\n";
+		}
+		die();*/
+
 		Yii::$app->session->set('ratio', ($unit == 'm') ? 1 : 1000);
 		Yii::$app->converter->ratio = ($unit == 'm') ? 1 : 1000;
 
@@ -170,8 +175,8 @@ class ProjectController extends RestController
 		$params = \Yii::$app->getRequest()->getBodyParams();
 		$model->update($params['machine']);
 
-		// $model->validate();
-		/*var_dump($model->ves);
+		/*$model->validate();
+		var_dump($model->discs);
 		die();*/
 
 		if ($model->validate() && $model->save()) {

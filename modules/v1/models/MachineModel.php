@@ -186,7 +186,7 @@ class MachineModel extends Model
 
 		$this->_discs = [];
 		foreach ($data['discs'] as $disc) {
-			if(!empty($disc['externalDiameter'])) {
+			if(!empty($disc['group'])) {
 				$this->setDiscs($disc, $machineId);
 			}
 		}
@@ -216,7 +216,7 @@ class MachineModel extends Model
 		$journalpositions = [];
 		$last = -1;
 		foreach ($data['journalbearings'] as $roll) {
-			if ($last != (float)$roll['position'] && !empty($roll['journalrotations']['speed'])) {
+			if ($last != (float)$roll['position'] && !empty($roll['journalrotations'][0]['speed'])) {
 				$last = (float)$roll['position'];
 				$journalpositions[] = $last;
 			}
@@ -466,6 +466,7 @@ class MachineModel extends Model
 		else
 			$disc->discId = RestUtils::generateId();
 
+
 		$disc->materialId = 0;
 		$disc->externalDiameter = 0;
 		$disc->internalDiameter = 0;
@@ -544,7 +545,7 @@ class MachineModel extends Model
 
 		$roll->position = (float)$model['position'] / 1000;
 
-		$this->createRotations($all, $roll->journalBearingId);
+		$this->createRotations($model['journalrotations'], $roll->journalBearingId);
 
 		return $roll;
 	}

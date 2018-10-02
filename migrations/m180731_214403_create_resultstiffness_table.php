@@ -17,7 +17,7 @@ class m180731_214403_create_resultstiffness_table extends Migration
 
         $this->createTable('resultstiffness', [
             'crticalMapId' => $keys,
-            'machineId' => $keys,
+            'settingId' => $this->integer(11),
             'initialStiff' => $scinumber,
             'initialSpeed' => $scinumber,
             'finalSpeed' => $scinumber,
@@ -28,17 +28,17 @@ class m180731_214403_create_resultstiffness_table extends Migration
         $this->addPrimaryKey('PK1', 'resultstiffness', 'crticalMapId');
 
         $this->createIndex(
-            'idx-stiffness-machine',
+            'idx-stiffness-setting',
             'resultstiffness',
-            'machineId'
+            'settingId'
         );
 
         $this->addForeignKey(
-            'fk-stiffness-machine',
+            'fk-stiffness-setting',
             'resultstiffness',
-            'machineId',
-            'machine',
-            'machineId',
+            'settingId',
+            'projectsetting',
+            'id',
             'CASCADE'
         );
     }
@@ -48,13 +48,14 @@ class m180731_214403_create_resultstiffness_table extends Migration
      */
     public function down()
     {
+        Yii::$app->db->createCommand()->truncateTable('resultstiffness')->execute();
         $this->dropForeignKey(
-            'fk-stiffness-machine',
+            'fk-stiffness-setting',
             'resultstiffness'
         );
 
         $this->dropIndex(
-            'idx-stiffness-machine',
+            'idx-stiffness-setting',
             'resultstiffness'
         );
 

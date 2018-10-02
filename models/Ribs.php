@@ -62,6 +62,7 @@ class Ribs extends \yii\db\ActiveRecord
     public function beforeValidate()
     {
         $this->position = sprintf('%e', (float)$this->position);
+        $this->number = sprintf('%e', (float)$this->number);
         $this->webThickness = sprintf('%e', (float)$this->webThickness);
         $this->webDepth = sprintf('%e', (float)$this->webDepth);
         $this->flangeWidth = sprintf('%e', (float)$this->flangeWidth);

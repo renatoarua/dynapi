@@ -5,17 +5,15 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "criticalmap".
+ * This is the model class for table "resultstiffness".
  *
  * @property string $crticalMapId
- * @property string $machineId
- * @property double $initialStiff
- * @property double $initialSpeed
- * @property double $finalSpeed
- * @property double $numDecades
- * @property double $numFrequencies
- *
- * @property Machine $machine
+ * @property int $settingId
+ * @property string $initialStiff
+ * @property string $initialSpeed
+ * @property string $finalSpeed
+ * @property string $numDecades
+ * @property string $numFrequencies
  */
 class Resultstiffness extends \yii\db\ActiveRecord
 {
@@ -33,11 +31,11 @@ class Resultstiffness extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['crticalMapId', 'machineId', 'initialStiff', 'initialSpeed', 'finalSpeed', 'numDecades', 'numFrequencies'], 'required'],
-            [['initialStiff', 'initialSpeed', 'finalSpeed', 'numDecades', 'numFrequencies'], 'number'],
-            [['crticalMapId', 'machineId'], 'string', 'max' => 21],
+            [['crticalMapId'], 'required'],
+            [['settingId'], 'integer'],
+            [['crticalMapId'], 'string', 'max' => 21],
+            [['initialStiff', 'initialSpeed', 'finalSpeed', 'numDecades', 'numFrequencies'], 'string', 'max' => 15],
             [['crticalMapId'], 'unique'],
-            [['machineId'], 'exist', 'skipOnError' => true, 'targetClass' => Machine::className(), 'targetAttribute' => ['machineId' => 'machineId']],
         ];
     }
 
@@ -48,20 +46,12 @@ class Resultstiffness extends \yii\db\ActiveRecord
     {
         return [
             'crticalMapId' => Yii::t('app', 'Crtical Map ID'),
-            'machineId' => Yii::t('app', 'Machine ID'),
+            'settingId' => Yii::t('app', 'Setting ID'),
             'initialStiff' => Yii::t('app', 'Initial Stiff'),
             'initialSpeed' => Yii::t('app', 'Initial Speed'),
             'finalSpeed' => Yii::t('app', 'Final Speed'),
             'numDecades' => Yii::t('app', 'Num Decades'),
             'numFrequencies' => Yii::t('app', 'Num Frequencies'),
         ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMachine()
-    {
-        return $this->hasOne(Machine::className(), ['machineId' => 'machineId']);
     }
 }

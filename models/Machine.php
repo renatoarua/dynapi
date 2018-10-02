@@ -88,11 +88,6 @@ class Machine extends \yii\db\ActiveRecord
         $fields[] = 'abs';
         $fields[] = 'foundations';
 
-        //$fields[] = 'resultline';
-        $fields[] = 'resultcampbell';
-        $fields[] = 'resultstiffness';
-        $fields[] = 'resultmodes';
-
         return $fields; 
     }
 
@@ -107,33 +102,10 @@ class Machine extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getResultcampbell()
-    {
-        return $this->hasMany(Resultcampbell::className(), ['machineId' => 'machineId'])
-            ->orderBy(["initialSpin"=>SORT_DESC]);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getResultstiffness()
-    {
-        return $this->hasMany(Resultstiffness::className(), ['machineId' => 'machineId']);
-    }
-
-    public function getResultmodes()
-    {
-        return $this->hasMany(Resultmodes::className(), ['machineId' => 'machineId']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getDiscs()
     {
         return $this->hasMany(Disc::className(), ['machineId' => 'machineId'])
             ->orderBy([
-                    "CAST(SUBSTRING_INDEX(`length`, ' ', -1) AS DECIMAL(5,5))"=>SORT_ASC,
                     "CAST(SUBSTRING_INDEX(`position`, ' ', -1) AS DECIMAL(5,5))"=>SORT_ASC
                 ]);
     }

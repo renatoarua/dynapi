@@ -80,6 +80,21 @@ class Projectsetting extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        $fields = parent::fields();
+        //$fields[] = 'resultline';
+        $fields[] = 'resultcampbell';
+        $fields[] = 'resultstiffness';
+        $fields[] = 'resultmodes';
+        $fields[] = 'resultconstant';
+        $fields[] = 'resultunbalance';
+        $fields[] = 'resulttorsional';
+        $fields[] = 'resulttime';
+
+        return $fields; 
+    }
+
     public function afterFind()
     {
         parent::afterFind();
@@ -93,5 +108,47 @@ class Projectsetting extends \yii\db\ActiveRecord
     public function getProject()
     {
         return $this->hasOne(Project::className(), ['projectId' => 'projectId']);
+    }
+
+    /**
+     * Result Fields
+     */
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getResultcampbell()
+    {
+        return $this->hasMany(Resultcampbell::className(), ['settingId' => 'id']);
+            // ->orderBy(["initialSpin"=>SORT_DESC]);
+    }
+    public function getResultstiffness()
+    {
+        return $this->hasMany(Resultstiffness::className(), ['settingId' => 'id']);
+    }
+
+    public function getResultmodes()
+    {
+        return $this->hasMany(Resultmodes::className(), ['settingId' => 'id']);
+    }
+
+    public function getResultconstant()
+    {
+        return $this->hasMany(Resultconstant::className(), ['settingId' => 'id']);
+    }
+
+    public function getResultunbalance()
+    {
+        return $this->hasMany(Resultunbalance::className(), ['settingId' => 'id']);
+    }
+
+    public function getResulttorsional()
+    {
+        return $this->hasMany(Resulttorsional::className(), ['settingId' => 'id']);
+    }
+
+    public function getResulttime()
+    {
+        return $this->hasMany(Resulttime::className(), ['settingId' => 'id']);
     }
 }

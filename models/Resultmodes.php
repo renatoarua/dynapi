@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "resultmodes".
  *
  * @property string $modesId
- * @property string $machineId
+ * @property int $settingId
  * @property string $maxFrequency
  * @property string $numModes
  */
@@ -28,8 +28,9 @@ class Resultmodes extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['modesId', 'machineId'], 'required'],
-            [['modesId', 'machineId'], 'string', 'max' => 21],
+            [['modesId'], 'required'],
+            [['settingId'], 'integer'],
+            [['modesId'], 'string', 'max' => 21],
             [['maxFrequency', 'numModes'], 'string', 'max' => 15],
             [['modesId'], 'unique'],
         ];
@@ -42,7 +43,7 @@ class Resultmodes extends \yii\db\ActiveRecord
     {
         return [
             'modesId' => Yii::t('app', 'Modes ID'),
-            'machineId' => Yii::t('app', 'Machine ID'),
+            'settingId' => Yii::t('app', 'Setting ID'),
             'maxFrequency' => Yii::t('app', 'Max Frequency'),
             'numModes' => Yii::t('app', 'Num Modes'),
         ];

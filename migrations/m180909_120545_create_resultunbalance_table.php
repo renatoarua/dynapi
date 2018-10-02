@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `resultcampbell`.
+ * Handles the creation of table `resultunbalance`.
  */
-class m180731_214352_create_resultcampbell_table extends Migration
+class m180909_120545_create_resultunbalance_table extends Migration
 {
     /**
      * {@inheritdoc}
@@ -15,26 +15,26 @@ class m180731_214352_create_resultcampbell_table extends Migration
         $scinumber = $this->string(15)->notNull()->defaultValue('0.000000e+0');
         $keys = $this->string(21)->notNull();
 
-        $this->createTable('resultcampbell', [
-            'campbellId' => $keys,
+        $this->createTable('resultunbalance', [
+            'unbalanceId' => $keys,
             'settingId' => $this->integer(11),
             'initialSpin' => $scinumber,
             'finalSpin' => $scinumber,
             'steps' => $scinumber,
-            'crsp' => $scinumber,
+            'modes' => $scinumber,
         ]);
 
-        $this->addPrimaryKey('PK1', 'resultcampbell', 'campbellId');
+        $this->addPrimaryKey('PK1', 'resultunbalance', 'unbalanceId');
 
         $this->createIndex(
-            'idx-campbell-setting',
-            'resultcampbell',
+            'idx-unbalance-setting',
+            'resultunbalance',
             'settingId'
         );
 
         $this->addForeignKey(
-            'fk-campbell-setting',
-            'resultcampbell',
+            'fk-unbalance-setting',
+            'resultunbalance',
             'settingId',
             'projectsetting',
             'id',
@@ -47,18 +47,16 @@ class m180731_214352_create_resultcampbell_table extends Migration
      */
     public function down()
     {
-        Yii::$app->db->createCommand()->truncateTable('resultcampbell')->execute();
-
         $this->dropForeignKey(
-            'fk-campbell-setting',
-            'resultcampbell'
+            'fk-unbalance-setting',
+            'resultunbalance'
         );
 
         $this->dropIndex(
-            'idx-campbell-setting',
-            'resultcampbell'
+            'idx-unbalance-setting',
+            'resultunbalance'
         );
 
-        $this->dropTable('resultcampbell');
+        $this->dropTable('resultunbalance');
     }
 }
