@@ -103,19 +103,6 @@ class Section extends \yii\db\ActiveRecord
         $this->position = sprintf('%e', (float)Yii::$app->converter->convert(+$this->position));
         $this->externalDiameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->externalDiameter));
         $this->internalDiameter = sprintf('%e', (float)Yii::$app->converter->convert(+$this->internalDiameter));
-        /*$length = (float)$this->position;
-        $x = 0;
-        $d = (float)$this->externalDiameter;
-        $y = -$d/2;
-        $path = "M$x,$y v$d h$length v-$d Z";
-        $this->area = ['d' => $path];
-        $this->border = [
-            'x' => $x,
-            'y' => $y,
-            'w' => $length,
-            'h' => $d
-        ];*/
-        // border: <NodeBorder>{ x: x, y: y, w: length, h: d }
     }
 
     /**

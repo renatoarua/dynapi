@@ -33,9 +33,10 @@ class RotordynController extends Controller
 			throw new Exception("No ID given");
 		}
 
-		$baseDir = "C:/wamp/www/dyntech/yiiangular/app";
+		$baseDir = "C:/wamp64/www/dyntech/yiiangular/app";
 		$logDir = $baseDir."/saved/projects/$id";
-		$command = "python $baseDir/app.py $id";
+		$python = "C:/Program Files/Python35/python.exe";
+		$command = "$python $baseDir/app.py $id";
 
 		if (!file_exists($logDir)) {
 			mkdir($logDir, 0777, true);
@@ -43,7 +44,7 @@ class RotordynController extends Controller
 
 		$log = "$logDir/log_".date('Y_m_d\Th_i_s').".txt";
 
-		$pid = $this->run_process($command);
+		$pid = $this->run_process($command, $log);
 		return $pid;
 	}
 
@@ -67,4 +68,4 @@ class RotordynController extends Controller
 	}
 }
 
-// wmic process call create 'python C:/wamp/www/dyntech/yiiangular/app/app.py 9zVKNtAevxFcr3ZxuNr3e' | find 'ProcessId'
+// wmic process call create 'python C:/wamp/www/dyntech/yiiangular/app/app.py 9zVKNtAevxFcr3ZxuNr3e' | find "ProcessId"

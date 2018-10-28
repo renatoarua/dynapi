@@ -16,6 +16,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 use app\models\Project;
+use app\models\Machine;
 use app\modules\v1\models\ProjectModel;
 use app\modules\v1\models\MachineModel;
 
@@ -46,6 +47,7 @@ class ProjectController extends RestController
 			'actions' => [
 				'index'  => ['get'],
 				'view'   => ['get'],
+				'chart'  => ['get'],
 				'create' => ['post'],
 				'update' => ['put'],
 				'delete' => ['delete'],
@@ -59,7 +61,7 @@ class ProjectController extends RestController
 		// setup access
 		$behaviors['access'] = [
 			'class' => AccessControl::className(),
-			'only' => ['index', 'view', 'create', 'update', 'delete'], //only be applied to
+			'only' => ['index', 'view', 'chart', 'create', 'update', 'delete'], //only be applied to
 			'rules' => [
 				[
 					'allow' => true,
@@ -67,12 +69,13 @@ class ProjectController extends RestController
 					'roles' => ['admin', 'manageStaffs'],
 				],
 				[
-					'actions' => ['index', 'view'],
+					'actions' => ['index', 'view', 'chart'],
 					'allow' => true,
 				],
 			],
 		];
 
+		$behaviors['authenticator']['except'][] = 'chart';
 		$behaviors['authenticator']['except'][] = 'view';
 		$behaviors['authenticator']['except'][] = 'index';
 
@@ -135,6 +138,26 @@ class ProjectController extends RestController
 		}
 	}
 
+	public function actionChart($id, $name="line")
+	{
+		$basePath = Yii::getAlias('@results');
+		$path = $basePath."/$id/$name.json";
+		// $path = realpath($basePath."$id/$name.json");
+
+		if(file_exists($path)) {
+			$response = \Yii::$app->getResponse();
+			$response->setStatusCode(200);
+			$string = file_get_contents($path);
+			$json = json_decode($string, true);
+			return $json;
+		} else {
+			// throw new NotFoundHttpException("Object not found: $id");
+			$response = \Yii::$app->getResponse();
+			$response->setStatusCode(201);
+			return [];
+		}
+	}
+
 	/**
 	 * Create new staff member from backend dashboard
 	 *
@@ -171,20 +194,18 @@ class ProjectController extends RestController
 	 * @throws HttpException
 	 */
 	public function actionUpdate($id) {
-		$model = new MachineModel();
 		$params = \Yii::$app->getRequest()->getBodyParams();
-		$model->update($params['machine']);
+		$model = new MachineModel();
+		// $machineId = $params['machine']['machineId'];
 
-		/*$model->validate();
-		var_dump($model->discs);
-		die();*/
+		$model->update($id, $params);
 
 		if ($model->validate() && $model->save()) {
 			$response = \Yii::$app->getResponse();
 			$response->setStatusCode(200);
 		} else {
 			// Validation error
-			throw new HttpException(422, json_encode($model->errors));
+			throw new HttpException(422, json_encode($model->errorList()));
 		}
 
 		return $this->actionView($id);

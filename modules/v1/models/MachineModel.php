@@ -4,43 +4,28 @@ namespace app\modules\v1\models;
 
 use Yii;
 
+use app\models\Project;
 use app\models\Machine;
-use app\models\Section;
-use app\models\Ribs;
-use app\models\Disc;
-use app\models\Rollerbearing;
-use app\models\Journalbearing;
-use app\models\Abs;
-use app\models\Ves;
-use app\models\Foundation;
-use app\models\Journalrotation;
-
-use app\modules\v1\models\VesModel;
+use app\models\Projectsetting;
+use app\models\User;
 
 use yii\base\Model;
 use yii\widgets\ActiveForm;
 
 use app\components\RestUtils;
+use yii\helpers\Json;
 
 class MachineModel extends Model
 {
+	private $_project;
+	private $_settings;
 	private $_machine;
-	private $_section;
-	private $_ribs;
-	private $_discs;
-	private $_rollerbearings;
-	private $_journalbearings;
-	private $_rotations;
-	private $_abs;
-	private $_ves;
-	private $_foundations;
+	private $_user;
 
 	public function rules()
 	{
-		// 'Section', 'Ribs', 'Disc', 'Rollerbearing'
-		// 'Journalbearing', 'Abs', 'Ves', 'Foundation'
 		return [
-			[['Machine'], 'required'],
+			[['Project', 'Projectsetting', 'Machine'], 'required'],
 		];
 	}
 
@@ -48,60 +33,14 @@ class MachineModel extends Model
 	{
 		$error = false;
 		if(!$this->machine->validate()) {
-			var_dump($this->machine->errors);
 			$error = true;
 		}
-		foreach ($this->section as $section) {
-			if(!$section->validate()) {
-				var_dump($section->errors);
-				$error = true;
-			}
-		}
-		foreach ($this->ribs as $rib) {
-			if(!$rib->validate()) {
-				var_dump($rib->errors);
-				$error = true;
-			}
-		}
-		foreach ($this->discs as $disc) {
-			if(!$disc->validate()) {
-				var_dump($disc->errors);
-				$error = true;
-			}
-		}
-		foreach ($this->rollerbearings as $roll) {
-			if(!$roll->validate()) {
-				var_dump($roll->errors);
-				$error = true;
-			}
-		}
-		foreach ($this->journalbearings as $roll) {
-			if(!$roll->validate()) {
-				var_dump($roll->errors);
-				$error = true;
-			}
-		}
-		foreach ($this->rotations as $rot) {
-			if(!$rot->validate()) {
-				var_dump($rot->errors);
-				$error = true;
-			}
-		}
-		foreach ($this->ves as $vs) {
-			if(!$vs->validate()) {
-				var_dump($ves->errors);
-				$error = true;
-			}
-		}
-		foreach ($this->foundations as $fund) {
-			if(!$fund->validate()) {
-				var_dump($fund->errors);
-				$error = true;
-			}
-		}
-		/*if(!$this->abs->validate()) {
+		if(!$this->projectsetting->validate()) {
 			$error = true;
-		}*/
+		}
+		if(!$this->project->validate()) {
+			$error = true;
+		}
 
 		if($error)
 			$this->addError(null);
@@ -118,145 +57,50 @@ class MachineModel extends Model
 		try {
 
 			$tx = Yii::$app->db->beginTransaction();
-
+			//$this->user->save();
+			$this->project->save();
+			$this->machine->projectId = $this->project->projectId;
+			$this->projectsetting->projectId = $this->project->projectId;
 			$this->machine->save();
-
-			foreach ($this->section as $section) {
-				$section->save();
-			}
-
-			foreach ($this->ribs as $rib) {
-				$rib->save();
-			}
-
-			foreach ($this->discs as $disc) {
-				$disc->save();
-			}
-
-			foreach ($this->rollerbearings as $roll) {
-				$roll->save();
-			}
-
-			foreach ($this->journalbearings as $roll) {
-				$roll->save();
-			}
-
-			foreach ($this->ves as $vs) {
-				$vs->save();
-			}
-
-			foreach ($this->foundations as $fund) {
-				$fund->save();
-			}
-
-			foreach ($this->rotations as $rot) {
-				$rot->save();
-			}
-
+			$this->projectsetting->save();
 			$tx->commit();
 			return true;
 
 		} catch(Exception $e) {
+			var_dump($e);
+			die();
 			$tx->rollBack();
 			return false;
 		}
 	}
 
-	public function update($data)
+	public function update($id, $data)
 	{
-		// parent::load($data, $formName);
-		/*$sections = $data['sections'];
-		usort($sections, 'self::sortByPosition');
-		$length = (float)(end($sections)['length']) / 1000;
-		var_dump($length);*/
-		$machineId = $data['machineId'];
-		$this->machine = Machine::find()->where([
-			'machineId' => $machineId
+		$this->project = Project::find()->where([
+			'projectId' => $id
 		])->one();
 
-		$this->machine->length = (float)$data['length'] / 1000;
-		$this->machine->ldratio = $data['ldratio'];
+		$this->machine = $this->project->machine;
+		$this->machine->load($data['machine'], '');
+		$this->machine->fixUnits();
 
-		$this->_section = [];
-		foreach ($data['sections'] as $section) {
-			if(!empty($section['position'])) {
-				$this->setSection($section, $machineId);
-			}
-		}
-
-		$this->_discs = [];
-		foreach ($data['discs'] as $disc) {
-			if(!empty($disc['group'])) {
-				$this->setDiscs($disc, $machineId);
-			}
-		}
-
-		$this->_ribs = [];
-		foreach ($data['ribs'] as $rib) {
-			if(!empty($rib['number'])) {
-				$this->setRibs($rib, $machineId);
-			}
-		}
-
-		foreach ($data['inertias'] as $disc) {
-			if(!empty($disc['length'])) {
-				$this->setInertias($disc, $machineId);
-			}
-		}
-
-		$this->_rollerbearings = [];
-		foreach ($data['rollerbearings'] as $roll) {
-			if((!empty($roll['mass']) || !empty($roll['inertia']))) {
-				$this->setRollerbearings($roll, $machineId);
-			}
-		}
-
-		$this->_journalbearings = [];
-		$this->_rotations = [];
-		$journalpositions = [];
-		$last = -1;
-		foreach ($data['journalbearings'] as $roll) {
-			if ($last != (float)$roll['position'] && !empty($roll['journalrotations'][0]['speed'])) {
-				$last = (float)$roll['position'];
-				$journalpositions[] = $last;
-			}
-		}
-
-		foreach ($journalpositions as $pos) {
-			$filtered = [];
-			$filtered = array_filter($data['journalbearings'], function ($value) use ($pos) {
-				return $value['position'] == $pos;
-			});
-
-			$this->setJournalbearings($filtered, $machineId);
-		}
-
-		$this->_ves = [];
-		foreach ($data['ves'] as $sve) {
-			if((!empty($sve['sheet']['translations']) || !empty($sve['sheet']['rotations']))) {
-				$v = new VesModel();
-				$v->loadAll($sve, $machineId);
-				$this->setVes($v);
-			}
-		}
-
-		$this->_foundations = [];
-		foreach ($data['foundations'] as $fund) {
-			if(!empty($fund['mass'])) {
-				$this->setFoundations($fund, $machineId);
-			}
-		}
-
-		// var_dump($this->section);
+		$this->projectsetting = $this->project->projectsetting;
+		$this->projectsetting->load($data['projectsetting'], '');
+		$this->projectsetting->fixUnits();
 	}
 
-	function sortByPosition($a, $b)
+	public function getProject()
 	{
-		$a = $a['length'];
-		$b = $b['length'];
+		return $this->_project;
+	}
 
-		if ($a == $b) return 0;
-		return ($a < $b) ? -1 : 1;
+	public function setProject($model)
+	{
+		if($model instanceof Project) {
+			$this->_project = $model;
+		} else if (is_array($model)) {
+			$this->_project = $this->createProject($model);
+		}
 	}
 
 	public function getMachine()
@@ -274,328 +118,79 @@ class MachineModel extends Model
 		}
 	}
 
-	public function getSection()
+	public function getProjectsetting()
 	{
-		return $this->_section;
+		return $this->_settings;
 	}
 
-	public function setSection($model, $machineId)
+	public function setProjectsetting($model)
 	{
-		//$this->_ribs = $model;
-		if($model instanceof Section) {
-			$this->_section[] = $model;
+		if($model instanceof Projectsetting) {
+			$this->_settings = $model;
 		} else if (is_array($model)) {
-			$this->_section[] = $this->createSection($model, $machineId);
+			$this->_settings = $this->createSettings($model);
 		}
 	}
 
-	public function getDiscs()
+	public function getUser()
 	{
-		return $this->_discs;
+		return $this->_user;
 	}
 
-	public function setDiscs($model, $machineId)
+	public function setUser($model)
 	{
-		//$this->_disc = $model;
-		if($model instanceof Disc) {
-			$this->_discs[] = $model;
+		if($model instanceof User) {
+			$this->_user = $model;
 		} else if (is_array($model)) {
-			$this->_discs[] = $this->createDisc($model, $machineId);
+			// $this->_user = $this->createUser($model);
 		}
 	}
 
-	public function setInertias($model, $machineId)
+	protected function createProject($model)
 	{
-		//$this->_disc = $model;
-		if($model instanceof Disc) {
-			$this->_discs[] = $model;
-		} else if (is_array($model)) {
-			$this->_discs[] = $this->createInertia($model, $machineId);
-		}
+		// project ID
+		$pro = new Project();
+		$pro->projectId = RestUtils::generateId();
+		$pro->userId = $model['userId'];
+		$pro->name = $model['name'];
+		$pro->status = $model['status'];
+
+		return $pro;
 	}
 
-	public function getRibs()
+	protected function createSettings($model)
 	{
-		return $this->_ribs;
+		$pro = new Projectsetting();
+		// $pro->projectId = RestUtils::generateId();
+		$pro->systemoptions = Json::encode($model['systemoptions']);
+		$pro->resultoptions = Json::encode($model['resultoptions']);
+		$pro->resultcampbell = Json::encode($model['resultcampbell']);
+        $pro->resultstiffness = Json::encode($model['resultstiffness']);
+        $pro->resultmodes = Json::encode($model['resultmodes']);
+        $pro->resultconstant = Json::encode($model['resultconstant']);
+        $pro->resultunbalance = Json::encode($model['resultunbalance']);
+        $pro->resulttorsional = Json::encode($model['resulttorsional']);
+        $pro->resulttime = Json::encode($model['resulttime']);
+
+		return $pro;
 	}
 
-	public function setRibs($model, $machineId)
+	protected function createMachine()
 	{
-		//$this->_ribs = $model;
-		if($model instanceof Ribs) {
-			$this->_ribs[] = $model;
-		} else if (is_array($model)) {
-			$this->_ribs[] = $this->createRib($model, $machineId);
-		}
-	}
+		$maq = new Machine();
+		$maq->machineId = RestUtils::generateId();
 
-	public function getRollerbearings()
-	{
-		return $this->_rollerbearings;
-	}
+		$maq->sections = Json::encode([]);
+        $maq->discs = Json::encode([]);
+        $maq->ribs = Json::encode([]);
+        $maq->rollerbearings = Json::encode([]);
+        $maq->journalbearings = Json::encode([]);
+        $maq->foundations = Json::encode([]);
+        $maq->ves = Json::encode([]);
+        $maq->abs = Json::encode([]);
+        $maq->ldratio = '1.000000e+0';
 
-	public function setRollerbearings($model, $machineId)
-	{
-		//$this->_ribs = $model;
-		if($model instanceof Rollerbearing) {
-			$this->_rollerbearings[] = $model;
-		} else if (is_array($model)) {
-			$this->_rollerbearings[] = $this->createRoller($model, $machineId);
-		}
-	}
-
-	public function getJournalbearings()
-	{
-		return $this->_journalbearings;
-	}
-
-	public function setJournalbearings($all, $machineId)
-	{
-		$model = array_values($all)[0];
-		if($model instanceof Journalbearing) {
-			$this->_journalbearings[] = $model;
-		} else if (is_array($model)) {
-			$this->_journalbearings[] = $this->createJournal($model, $machineId, $all);
-		}
-	}
-
-	public function getRotations()
-	{
-		return $this->_rotations;
-	}
-
-	public function setRotations($model, $journalBearingId)
-	{
-		if($model instanceof Journalrotation) {
-			$this->_rotations[] = $model;
-		} else if (is_array($model)) {
-			$this->_rotations[] = $this->createRotation($model, $journalBearingId);
-		}
-	}
-
-	public function addRotation($model)
-	{
-		$this->_rotations[] = $model;
-	}
-
-	public function getVes()
-	{
-		return $this->_ves;
-	}
-
-	public function setVes($model)
-	{
-		if($model instanceof VesModel) {
-			$this->_ves[] = $model;
-		} else if (is_array($model)) {
-			// $this->_ves[] = $this->createFoundation($model, $machineId);
-		}
-	}
-
-	public function getFoundations()
-	{
-		return $this->_foundations;
-	}
-
-	public function setFoundations($model, $machineId)
-	{
-		//$this->_ribs = $model;
-		if($model instanceof Foundation) {
-			$this->_foundations[] = $model;
-		} else if (is_array($model)) {
-			$this->_foundations[] = $this->createFoundation($model, $machineId);
-		}
-	}
-
-	protected function createSection($model, $machineId)
-	{
-		$sess = new Section();
-		$sess->machineId = $machineId;
-		if($model['sectionId'] != '' && !empty($model['sectionId']))
-			$sess = Section::findById($model['sectionId']);
-		else 
-			$sess->sectionId = RestUtils::generateId();
-
-		$sess->materialId = (int)$model['materialId'];
-		$sess->position = (float)$model['position'] / 1000;
-		$sess->externalDiameter = (float)$model['externalDiameter'] / 1000;
-		$sess->internalDiameter = (float)$model['internalDiameter'] / 1000;
-		$sess->young = $model['young'];
-		$sess->poisson = $model['poisson'];
-		$sess->density = $model['density'];
-		$sess->axialForce = $model['axialForce'];
-		$sess->magneticForce = $model['magneticForce'];
-
-		return $sess;
-	}
-
-	protected function createDisc($model, $machineId)
-	{
-		if((float)$model['length'] > 0)
-			return $this->createInertia($model, $machineId);
-
-		$disc = new Disc();
-		$disc->machineId = $machineId;
-		if($model['discId'] != '' && !empty($model['discId']))
-			$disc = Disc::findById($model['discId']);
-		else
-			$disc->discId = RestUtils::generateId();
-
-		$disc->materialId = (int)$model['materialId'];
-		$disc->position = (float)$model['position'] / 1000;
-		$disc->externalDiameter = (float)$model['externalDiameter'] / 1000;
-		$disc->internalDiameter = (float)$model['internalDiameter'] / 1000;
-		$disc->thickness = (float)$model['thickness'] / 1000;
-		$disc->density = $model['density'];
-
-		$disc->ix = 0;
-		$disc->iy = 0;
-		$disc->iz = 0;
-		$disc->length = 0;
-		$disc->mass = 0;
-
-		return $disc;
-	}
-
-	protected function createInertia($model, $machineId)
-	{
-		$disc = new Disc();
-		$disc->machineId = $machineId;
-		if($model['discId'] != '' && !empty($model['discId']))
-			$disc = Disc::findById($model['discId']);
-		else
-			$disc->discId = RestUtils::generateId();
-
-
-		$disc->materialId = 0;
-		$disc->externalDiameter = 0;
-		$disc->internalDiameter = 0;
-		$disc->thickness = 0;
-		$disc->density = 0;
-
-		$disc->position = (float)$model['position'] / 1000;
-		$disc->ix = $model['ix'];
-		$disc->iy = $model['iy'];
-		$disc->iz = $model['iz'];
-		$disc->length = (float)$model['length'] / 1000;
-		$disc->mass = $model['mass'];
-
-		return $disc;
-	}
-
-	protected function createRib($model, $machineId)
-	{
-		$rib = new Ribs();
-		$rib->machineId = $machineId;
-		if($model['ribId'] != '' && !empty($model['ribId']))
-			$rib = Ribs::findById($model['ribId']);
-		else
-			$rib->ribId = RestUtils::generateId();
-
-		$rib->position = (float)$model['position'] / 1000;
-		$rib->number = (int)$model['number'];
-		$rib->webThickness = (float)$model['webThickness'] / 1000;
-		$rib->webDepth = (float)$model['webDepth'] / 1000;
-		$rib->flangeWidth = (float)$model['flangeWidth'] / 1000;
-		$rib->flangeThick = (float)$model['flangeThick'] / 1000;
-
-		return $rib;
-	}
-
-	protected function createRoller($model, $machineId)
-	{
-		$roll = new Rollerbearing();
-		$roll->machineId = $machineId;
-		if($model['rollerBearingId'] != '' && !empty($model['rollerBearingId']))
-			$roll = Rollerbearing::findById($model['rollerBearingId']);
-		else
-			$roll->rollerBearingId = RestUtils::generateId();
-
-		$roll->position = (float)$model['position'] / 1000;
-		$roll->inertia = $model['inertia'];
-		$roll->mass = $model['mass'];
-		$roll->kxx = $model['kxx'];
-		$roll->kxz = $model['kxz'];
-		$roll->kzx = $model['kzx'];
-		$roll->kzz = $model['kzz'];
-		$roll->cxx = $model['cxx'];
-		$roll->cxz = $model['cxz'];
-		$roll->czx = $model['czx'];
-		$roll->czz = $model['czz'];
-		$roll->ktt = $model['ktt'];
-		$roll->ktp = $model['ktp'];
-		$roll->kpt = $model['kpt'];
-		$roll->kpp = $model['kpp'];
-		$roll->ctt = $model['ctt'];
-		$roll->ctp = $model['ctp'];
-		$roll->cpt = $model['cpt'];
-		$roll->cpp = $model['cpp'];
-
-		return $roll;
-	}
-
-	protected function createJournal($model, $machineId, $all)
-	{
-		$roll = new Journalbearing();
-		$roll->machineId = $machineId;
-		if($model['journalBearingId'] != '' && !empty($model['journalBearingId']))
-			$roll = Journalbearing::findById($model['journalBearingId']);
-		else
-			$roll->journalBearingId = RestUtils::generateId();
-
-		$roll->position = (float)$model['position'] / 1000;
-
-		$this->createRotations($model['journalrotations'], $roll->journalBearingId);
-
-		return $roll;
-	}
-
-	protected function createRotations($models, $id)
-	{
-		foreach ($models as $model) {
-			$this->addRotation($this->createRotation($model, $id));
-		}
-	}
-
-	protected function createRotation($model, $id)
-	{
-		$rot = new Journalrotation();
-		if($model['journalRotationId'] != '' && !empty($model['journalRotationId']))
-			$rot = Journalrotation::findById($model['journalRotationId']);
-		else
-			$rot->journalRotationId = RestUtils::generateId();
-
-		$rot->journalBearingId = $id;
-		$rot->speed = $model['speed'];
-		$rot->kxx = $model['kxx'];
-		$rot->kxz = $model['kxz'];
-		$rot->kzx = $model['kzx'];
-		$rot->kzz = $model['kzz'];
-		$rot->cxx = $model['cxx'];
-		$rot->cxz = $model['cxz'];
-		$rot->czx = $model['czx'];
-		$rot->czz = $model['czz'];
-
-		return $rot;
-	}
-
-	protected function createFoundation($model, $machineId)
-	{
-		$roll = new Foundation();
-		$roll->machineId = $machineId;
-		if($model['foundationId'] != '' && !empty($model['foundationId']))
-			$roll = Foundation::findById($model['foundationId']);
-		else
-			$roll->foundationId = RestUtils::generateId();
-
-		$roll->position = (float)$model['position'] / 1000;
-		$roll->mass = $model['mass'];
-		$roll->kxx = $model['kxx'];
-		$roll->kzz = $model['kzz'];
-		$roll->cxx = $model['cxx'];
-		$roll->czz = $model['czz'];
-
-		return $roll;
+		return $maq;
 	}
 
 	public function errorSummary($form)
@@ -637,41 +232,11 @@ class MachineModel extends Model
 
 	private function getAllModels()
 	{
-		$arr = [];
-		$arr[] = ['Machine' => $this->machine];
-
-		foreach ($this->section as $key => $value) {
-			$arr[] = ['Section'.$key => $value];
-		}
-
-		foreach ($this->ribs as $key => $value) {
-			$arr[] = ['Ribs'.$key => $value];
-		}
-
-		foreach ($this->discs as $key => $value) {
-			$arr[] = ['Disc'.$key => $value];
-		}
-
-		foreach ($this->rollerbearings as $key => $value) {
-			$arr[] = ['Rollerbearing'.$key => $value];
-		}
-
-		foreach ($this->journalbearings as $key => $value) {
-			$arr[] = ['Journalbearing'.$key => $value];
-		}
-
-		foreach ($this->rotations as $key => $value) {
-			$arr[] = ['Journalrotation'.$key => $value];
-		}
-
-		foreach ($this->ves as $key => $value) {
-			$arr[] = ['VesModel'.$key => $value];
-		}
-
-		foreach ($this->foundations as $key => $value) {
-			$arr[] = ['Foundation'.$key => $value];
-		}
-
-		return $arr;
+		return [
+			'User' => $this->user,
+			'Project' => $this->project,
+			'Projectsetting' => $this->projectsetting,
+			'Machine' => $this->machine,
+		];
 	}
 }

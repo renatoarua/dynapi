@@ -57,13 +57,16 @@ $config = [
                     'pluralize'     => false,
                     'tokens' => [
                         '{id}'      => '<id:\w+>',
-                        '{userId}'  => '<id:\d+>',
-                        '{unit}'    => '<id:\w+>',
+                        '{userId}'  => '<userId:\d+>',
+                        '{unit}'    => '<unit:\w+>',
+                        '{name}'    => '<name:\w+>',
                     ],
                     'extraPatterns' => [
                         'OPTIONS {id}'       => 'options',
+                        'OPTIONS {id}/{name}'=> 'options',
                         'GET index {userId}' => 'index',
-                        'GET view {unit}' => 'view',
+                        'GET view {unit}'    => 'view',
+                        'GET {id}/{name}'    => 'chart',
                     ],
                 ],
                 [

@@ -13,25 +13,17 @@ class m180731_213512_create_projectsetting_table extends Migration
     public function up()
     {
         $this->createTable('projectsetting', [
-            'id' => $this->primaryKey(),
-            'projectId'     => $this->string(21),
-            'foundation' => $this->boolean(),
-            'rollerbearing' => $this->boolean(),
-            'journalbearing' => $this->boolean(),
-            'ves' => $this->boolean(),
-            'abs' => $this->boolean(),
-            'staticLine' => $this->boolean(),
-            'fatigue' => $this->boolean(),
-            'campbell' => $this->boolean(),
-            'modes' => $this->boolean(),
-            'criticalMap' => $this->boolean(),
-            'unbalancedResponse' => $this->boolean(),
-            'constantResponse' => $this->boolean(),
-            'timeResponse' => $this->boolean(),
-            'torsional' => $this->boolean(),
-            'balanceOptimization' => $this->boolean(),
-            'vesOptimization' => $this->boolean(),
-            'absOptimization' => $this->boolean(),
+            'id'              => $this->primaryKey(),
+            'projectId'       => $this->string(21),
+            'systemoptions'   => $this->json(),
+            'resultoptions'   => $this->json(),
+            'resultcampbell'  => $this->json(),
+            'resultstiffness' => $this->json(),
+            'resultmodes'     => $this->json(),
+            'resultconstant'  => $this->json(),
+            'resultunbalance' => $this->json(),
+            'resulttorsional' => $this->json(),
+            'resulttime'      => $this->json(),
         ]);
 
         // creates index for column `projectId`

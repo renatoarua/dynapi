@@ -13,12 +13,18 @@ class m180731_185538_create_machine_table extends Migration
     public function up()
     {
         $this->createTable('machine', [
-            'machineId'     => $this->string(21),
-            'projectId'     => $this->string(21),
-            'status'        => $this->string(3),
-            'version'       => $this->string(15),
-            'length'        => $this->string(15),
-            'ldratio'       => $this->string(15),
+            'machineId'       => $this->string(21),
+            'projectId'       => $this->string(21),
+            'sections'        => $this->json(),
+            'discs'           => $this->json(),
+            'ribs'            => $this->json(),
+            'rollerbearings'  => $this->json(),
+            'journalbearings' => $this->json(),
+            'journaloptimize' => $this->json(),
+            'foundations'     => $this->json(),
+            'ves'             => $this->json(),
+            'abs'             => $this->json(),
+            'ldratio'         => $this->string(15),
         ]);
 
         $this->addPrimaryKey('PK1', 'machine', 'machineId');

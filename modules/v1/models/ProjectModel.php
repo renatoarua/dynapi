@@ -13,6 +13,7 @@ use yii\base\Model;
 use yii\widgets\ActiveForm;
 
 use app\components\RestUtils;
+use yii\helpers\Json;
 
 class ProjectModel extends Model
 {
@@ -31,10 +32,7 @@ class ProjectModel extends Model
 	public function afterValidate()
 	{
 		$error = false;
-		/*if(!$this->user->validate()) {
-			$error = true;
-		}
-		if(!$this->machine->validate()) {
+		/*if(!$this->machine->validate()) {
 			$error = true;
 		}
 		if(!$this->projectsetting->validate()) {
@@ -59,7 +57,6 @@ class ProjectModel extends Model
 		try {
 
 			$tx = Yii::$app->db->beginTransaction();
-
 			//$this->user->save();
 			$this->project->save();
 			$this->machine->projectId = $this->project->projectId;
@@ -83,6 +80,9 @@ class ProjectModel extends Model
 		$this->projectsetting = $data['settings'];
 		$this->machine = $this->createMachine();
 		$this->user = User::findIdentity($this->project->userId);
+
+		$this->projectsetting->projectId = '0L8qMKDBYWXb34IWwRtqg';
+		$this->projectsetting->save();
 	}
 
 	public function getProject()
@@ -158,23 +158,37 @@ class ProjectModel extends Model
 	{
 		$pro = new Projectsetting();
 		$pro->projectId = RestUtils::generateId();
-		$pro->foundation = ($model[0] == 'true' || $model[0] == '1') ? '1' : '0';
-		$pro->rollerbearing = ($model[1] == 'true' || $model[1] == '1') ? '1' : '0';
-		$pro->journalbearing = ($model[2] == 'true' || $model[2] == '1') ? '1' : '0';
-		$pro->ves = ($model[3] == 'true' || $model[3] == '1') ? '1' : '0';
-		$pro->abs = ($model[4] == 'true' || $model[4] == '1') ? '1' : '0';
-		$pro->staticLine = ($model[5] == 'true' || $model[5] == '1') ? '1' : '0';
-		$pro->fatigue = ($model[6] == 'true' || $model[6] == '1') ? '1' : '0';
-		$pro->campbell = ($model[7] == 'true' || $model[7] == '1') ? '1' : '0';
-		$pro->modes = ($model[8] == 'true' || $model[8] == '1') ? '1' : '0';
-		$pro->criticalMap = ($model[9] == 'true' || $model[9] == '1') ? '1' : '0';
-		$pro->unbalancedResponse = ($model[10] == 'true' || $model[10] == '1') ? '1' : '0';
-		$pro->constantResponse = ($model[11] == 'true' || $model[11] == '1') ? '1' : '0';
-		$pro->timeResponse = ($model[12] == 'true' || $model[12] == '1') ? '1' : '0';
-		$pro->torsional = ($model[13] == 'true' || $model[13] == '1') ? '1' : '0';
-		$pro->balanceOptimization = ($model[14] == 'true' || $model[14] == '1') ? '1' : '0';
-		$pro->vesOptimization = ($model[15] == 'true' || $model[15] == '1') ? '1' : '0';
-		$pro->absOptimization = ($model[16] == 'true' || $model[16] == '1') ? '1' : '0';
+
+		$pro->systemoptions = Json::encode([
+			'rollerbearing' => $model[1],
+			'journalbearing' => $model[2],
+			'foundation' => $model[0],
+			'ves' => $model[3],
+			'abs' => $model[4]
+		]);
+
+		$pro->resultoptions = Json::encode([
+			'staticLine' => $model[5],
+			'fatigue' => $model[6],
+			'campbell' => $model[7],
+			'modes' => $model[8],
+			'criticalMap' => $model[9],
+			'unbalancedResponse' => $model[10],
+			'constantResponse' => $model[11],
+			'timeResponse' => $model[12],
+			'torsional' => $model[13],
+			'balanceOptimization' => $model[14],
+			'vesOptimization' => $model[15],
+			'absOptimization' => $model[16]
+		]);
+
+		$pro->resultcampbell = Json::encode([]);
+        $pro->resultstiffness = Json::encode([]);
+        $pro->resultmodes = Json::encode([]);
+        $pro->resultconstant = Json::encode([]);
+        $pro->resultunbalance = Json::encode([]);
+        $pro->resulttorsional = Json::encode([]);
+        $pro->resulttime = Json::encode([]);
 
 		return $pro;
 	}
@@ -183,6 +197,16 @@ class ProjectModel extends Model
 	{
 		$maq = new Machine();
 		$maq->machineId = RestUtils::generateId();
+
+		$maq->sections = Json::encode([]);
+        $maq->discs = Json::encode([]);
+        $maq->ribs = Json::encode([]);
+        $maq->rollerbearings = Json::encode([]);
+        $maq->journalbearings = Json::encode([]);
+        $maq->foundations = Json::encode([]);
+        $maq->ves = Json::encode([]);
+        $maq->abs = Json::encode([]);
+        $maq->ldratio = '1.000000e+0';
 
 		return $maq;
 	}
