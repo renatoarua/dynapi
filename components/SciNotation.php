@@ -42,6 +42,9 @@ class SciNotation
         if(!is_array($dat))
             return [];
 
+        // $conv = Yii::$app->converter->Convertor;
+        // $conv->to(+$dat[$i]['position'], 'length'))
+
         for ($i=0; $i < count($dat); $i++) {
             $dat[$i]['position'] = sprintf('%e', (float)Yii::$app->converter->convert(+$dat[$i]['position']));
             $dat[$i]['externalDiameter'] = sprintf('%e', (float)Yii::$app->converter->convert(+$dat[$i]['externalDiameter']));
@@ -575,6 +578,7 @@ class SciNotation
             usort($phases, function ($a, $b) {
                 return +$a['position'] > +$b['position'];
             });
+            $phases = self::afterFindPhaseUnb($phases);
             $dat[$i]['phases'] = $phases;
 
             $responses = self::afterFindPosition($dat[$i]['responses']);
@@ -658,6 +662,7 @@ class SciNotation
             usort($phases, function ($a, $b) {
                 return +$a['position'] > +$b['position'];
             });
+            $phases = self::afterFindPhaseUnb($phases);
             $dat[$i]['phases'] = $phases;
         }
         return $dat;
@@ -684,7 +689,7 @@ class SciNotation
         for ($i=0; $i < count($dat); $i++) {
             $dat[$i]['phase'] = sprintf('%e', (float)$dat[$i]['phase']);
             $dat[$i]['position'] = sprintf('%e', (float)$dat[$i]['position'] / 1000);
-            $dat[$i]['unbalance'] = sprintf('%e', (float)$dat[$i]['unbalance']);
+            $dat[$i]['unbalance'] = sprintf('%e', (float)$dat[$i]['unbalance'] / 1e6);
         }
         return $dat;
     }
@@ -696,7 +701,7 @@ class SciNotation
 
         for ($i=0; $i < count($dat); $i++) {
             $dat[$i]['position'] = sprintf('%e', (float)$dat[$i]['position'] / 1000);
-            $dat[$i]['phase'] = sprintf('%e', (float)$dat[$i]['phase']);
+            $dat[$i]['phase'] = sprintf('%e', (float)$dat[$i]['phase'] / 1e6);
             $dat[$i]['tork'] = sprintf('%e', (float)$dat[$i]['tork']);
         }
         return $dat;
@@ -709,7 +714,7 @@ class SciNotation
 
         for ($i=0; $i < count($dat); $i++) {
             $dat[$i]['position'] = sprintf('%e', (float)$dat[$i]['position'] / 1000);
-            $dat[$i]['corrd'] = sprintf('%e', (float)$dat[$i]['coord']);
+            $dat[$i]['coord'] = sprintf('%e', (float)$dat[$i]['coord']);
         }
         return $dat;
     }
@@ -721,6 +726,17 @@ class SciNotation
 
         for ($i=0; $i < count($dat); $i++) {
             $dat[$i]['position'] = sprintf('%e', (float)Yii::$app->converter->convert(+$dat[$i]['position']));
+        }
+        return $dat;
+    }
+
+    public static function afterFindPhaseUnb($dat)
+    {
+        if(!is_array($dat))
+            return [];
+
+        for ($i=0; $i < count($dat); $i++) {
+            $dat[$i]['unbalance'] = sprintf('%e', (float)(+$dat[$i]['unbalance']*1e6));
         }
         return $dat;
     }

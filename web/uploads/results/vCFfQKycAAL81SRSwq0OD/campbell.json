@@ -5,7 +5,7 @@
                 "color": "#e6194b"
             },
             "mode": "lines",
-            "name": "Frequency_1",
+            "name": "Frequency 1",
             "type": "scatter",
             "x": [
                 500.0,
@@ -419,7 +419,7 @@
                 "color": "#3cb44b"
             },
             "mode": "lines",
-            "name": "Frequency_2",
+            "name": "Frequency 2",
             "type": "scatter",
             "x": [
                 500.0,
@@ -830,10 +830,10 @@
         },
         {
             "line": {
-                "color": "#ffe119"
+                "color": "#ed5b37"
             },
             "mode": "lines",
-            "name": "Frequency_3",
+            "name": "Frequency 3",
             "type": "scatter",
             "x": [
                 500.0,
@@ -1244,10 +1244,10 @@
         },
         {
             "line": {
-                "color": "#0082c8"
+                "color": "#008080"
             },
             "mode": "lines",
-            "name": "Frequency_4",
+            "name": "Frequency 4",
             "type": "scatter",
             "x": [
                 500.0,
@@ -1658,10 +1658,10 @@
         },
         {
             "line": {
-                "color": "#f58231"
+                "color": "#ee9a37"
             },
             "mode": "lines",
-            "name": "Frequency_5",
+            "name": "Frequency 5",
             "type": "scatter",
             "x": [
                 500.0,
@@ -2072,10 +2072,10 @@
         },
         {
             "line": {
-                "color": "#911eb4"
+                "color": "#0082c8"
             },
             "mode": "lines",
-            "name": "Frequency_6",
+            "name": "Frequency 6",
             "type": "scatter",
             "x": [
                 500.0,
@@ -2486,8 +2486,8 @@
         },
         {
             "line": {
-                "color": "#000",
-                "width": 4
+                "color": "#3fbbb0",
+                "width": 3
             },
             "mode": "lines",
             "name": "rotation 2X",
@@ -2902,8 +2902,8 @@
         },
         {
             "line": {
-                "color": "#000",
-                "width": 4
+                "color": "#3fbbb0",
+                "width": 3
             },
             "mode": "lines",
             "name": "rotation 1X",
@@ -3318,8 +3318,8 @@
         },
         {
             "line": {
-                "color": "#000",
-                "width": 4
+                "color": "#3fbbb0",
+                "width": 3
             },
             "mode": "lines",
             "name": "rotation 0.5X",
@@ -3796,6 +3796,24 @@
         }
     ],
     "layout": {
-        "title": "Campbell Diagram - 26, Oct 2018"
+        "title": "Campbell Diagram - 28, Nov 2018"
+    },
+    "results": {
+        "FN": [
+            4235.411770588529,
+            4503.550177508876,
+            12165.483274163707,
+            17062.178108905446
+        ],
+        "FN1": [
+            2127.3563678183914,
+            2243.3871693584683,
+            6465.348267413371,
+            7908.420421021052
+        ],
+        "FN2": [
+            8350.117505875294,
+            9109.680484024202
+        ]
     }
 }

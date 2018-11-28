@@ -14,9 +14,22 @@ use app\controllers\RestController;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
+use yii\web\BadRequestHttpException;
 
+use app\models\User;
+use app\models\Run;
+use app\models\Runlog;
+use app\models\LogEvent;
+use app\models\PayLedger;
 use app\models\Machine;
 use app\modules\v1\models\MachineModel;
+
+// use Sse\Events\TimedEvent;
+use Sse\Event;
+use Sse\Data;
+
+// use yii\base\Event;
+use odannyc\Yii2SSE\SSEBase;
 
 use yii\helpers\ArrayHelper;
 use app\components\RestUtils;
@@ -28,7 +41,9 @@ class MachineController extends RestController
 	public function __construct($id, $module, $config = [])
 	{
 		parent::__construct($id, $module, $config);
-
+		// Event::on('app\models\Runlog', Runlog::EVENT_NEW_LOG, function ($ev) {
+		// 	echo $ev->log->status;
+		// });
 	}
 
 	public function actions()
@@ -49,7 +64,9 @@ class MachineController extends RestController
 				'update' => ['put'],
 				'delete' => ['delete'],
 				'execute'=> ['get'],
-				'change'=> ['get'],
+				'change' => ['get'],
+				'log'    => ['post'],
+				'status' => ['get'],
 			],
 		];
 				//'getPermissions'    =>  ['get'],
@@ -58,14 +75,15 @@ class MachineController extends RestController
 		//$behaviors['authenticator']['except'] = ['index', 'view', 'options'];
 
 		$behaviors['authenticator']['except'][] = 'change';
-		$behaviors['authenticator']['except'][] = 'execute';
+		$behaviors['authenticator']['except'][] = 'status';
+		$behaviors['authenticator']['except'][] = 'log';
 		$behaviors['authenticator']['except'][] = 'view';
 		$behaviors['authenticator']['except'][] = 'index';
 
 		// setup access
 		$behaviors['access'] = [
 			'class' => AccessControl::className(),
-			'only' => ['index', 'view', 'create', 'update', 'delete', 'execute', 'change'], //only be applied to
+			'only' => ['index', 'view', 'create', 'update', 'delete', 'execute', 'change', 'log', 'status'], //only be applied to
 			'rules' => [
 				[
 					'allow' => true,
@@ -73,9 +91,18 @@ class MachineController extends RestController
 					'roles' => ['admin', 'manageStaffs'],
 				],
 				[
-					'actions' => ['index', 'view', 'update', 'execute', 'change'],
+					'actions' => ['index', 'view', 'update', 'execute', 'change', 'log', 'status'],
 					'allow' => true,
 				],
+			],
+		];
+
+		$behaviors['contentNegotiator'] = [
+			'class' => \yii\filters\ContentNegotiator::className(),
+			'only' => ['status'],
+			'formatParam' => '_format',
+			'formats' => [
+				'text/event-stream' => \yii\web\Response::FORMAT_RAW,
 			],
 		];
 
@@ -203,15 +230,6 @@ class MachineController extends RestController
 		return "ok";
 	}
 
-	public function actionExecute($id = null) {
-		if(is_null($id)) {
-			throw new Exception("No ID given");
-		}
-		$consoleController = new \app\commands\RotordynController('rotordyn', Yii::$app);
-		$res = $consoleController->actionRunMachine($id);
-		return $res;
-	}
-
 	public function actionChange($id = null) {
 		/*$rows = (new \yii\db\Query())
 			->select(['sectiOnId', 'position', 'externalDiameter', 'internalDiameter', 'young', 'poisson', 'density', 'axialForce', 'magneticForce'])
@@ -246,4 +264,128 @@ class MachineController extends RestController
 		return "ok";
 	}
 
+	public function actionExecute($id = null) {
+		\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+		if(is_null($id)) {
+			throw new BadRequestHttpException("No projectId given");
+		}
+
+		// check balance,
+		$consoleController = new \app\commands\RotordynController('rotordyn', Yii::$app);
+		$res = $consoleController->actionRunMachine($id);
+
+		$data = new Data('file', array('path' => './uploads/results/'.$id.'/run'.$res->id));
+        $data->set('tasks', json_encode(['time' => time(), 'projectId' => $id]));
+		// run model
+		return $res;
+	}
+
+	public function actionLog() {
+		\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+		$params = Yii::$app->request->post();
+
+		$model = new Runlog();
+		if(isset($params['Runlog']['id'])) {
+			$model = Runlog::find()->where([
+				'id' => $params['Runlog']['id']
+			])->one();
+		}
+
+		$model->load($params);
+
+		$model->setMessages($params['LogModel']);
+		$projectId = $params['LogModel']['projectId'];
+
+		$data = new Data('file', array('path' => './uploads/results/'.$projectId.'/run'.$model->runId));
+        $data->set('tasks', json_encode($model->getMessages()));
+
+
+		if((float)$model->cost > 0) {
+			$ref = Run::find()->where([
+				'id' => $model->runId
+			])->one();
+
+			$entry = new PayLedger();
+			// check balance, pay the robot or in the execute
+			$entry->actionId = 3;
+			$entry->sellerId = $ref->userId;
+			$entry->buyerId = 4;
+			$entry->tokenId = 'DYN';
+			$entry->date = time();
+			$entry->amount = +$model->cost;
+
+			// $entry->validate();
+			// var_dump($entry->errors);
+			// die();
+			$entry->save();
+		}
+
+		if(!isset($params['Runlog'])) {
+			$response = \Yii::$app->getResponse();
+            $response->setStatusCode(200);
+            return ['id' => -1];
+		}
+		elseif ($model->validate() && $model->save()) {
+            $response = \Yii::$app->getResponse();
+            $response->setStatusCode(200);
+            $id = implode(',', array_values($model->getPrimaryKey(true)));
+            return ['id' => $id];
+        } else {
+            // Validation error
+            throw new HttpException(422, json_encode($model->errors));
+        }
+	}
+
+	public function actionStatus($runid)
+	{
+		list($projectId, $runId) = explode("_", $runid);
+		$data = new Data('file', array('path' => './uploads/results/'.$projectId.'/run'.$runId));
+		// \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+		// check user, runId, projectId
+
+		$sse = Yii::$app->sse;
+		$sse->set('sleep_time', 0.5);
+		$sse->set('allow_cors', true);
+		$timeEvent = new LogEventHandler($data, $runId);
+
+		$sse->addEventListener('logger', $timeEvent);
+
+		$sse->start();
+		$sse->flush();
+
+		// $sse->removeEventListener('logger');
+	}
+
+}
+
+class LogEventHandler implements Event
+{
+	private $cache = 0;
+    private $storage;
+	private $tasks;
+
+	public $runId = -1;
+
+	public function __construct($data, $runid)
+	{
+        $this->storage = $data;
+		$this->runId = $runid;
+    }
+
+	public function check()
+	{
+		$this->tasks = json_decode($this->storage->get('tasks'));
+		if($this->tasks->time !== $this->cache){
+            $this->cache = $this->tasks->time;
+            return true;
+        }
+
+		return false;
+	}
+
+	public function update()
+	{
+		return json_encode($this->tasks);
+	}
 }

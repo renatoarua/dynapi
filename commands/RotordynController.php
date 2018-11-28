@@ -4,6 +4,10 @@ set_time_limit(0);
 
 use Yii;
 use yii\console\Controller;
+use app\models\User;
+use app\models\Run;
+
+use yii\web\BadRequestHttpException;
 
 class RotordynController extends Controller
 {
@@ -30,22 +34,48 @@ class RotordynController extends Controller
 
 	private function executeAsyncShellCommand($id = null) {
 		if(!$id) {
-			throw new Exception("No ID given");
+			throw new BadRequestHttpException(
+                'Invalid parameters: No projectId given.'
+            );
 		}
+
+		$user = User::findIdentity(\Yii::$app->user->getId());
+        if (!$user) {
+        	throw new BadRequestHttpException(
+                'Invalid parameters: User not logged in!'
+            );
+        }
+
+        $response = \Yii::$app->getResponse();
+        $response->setStatusCode(200);
 
 		$baseDir = "C:/wamp64/www/dyntech/yiiangular/app";
 		$logDir = $baseDir."/saved/projects/$id";
 		$python = "C:/Program Files/Python35/python.exe";
-		$command = "$python $baseDir/app.py $id";
+
+		$log_file = "log_".date('Y_m_d\Th_i_s').".txt";
+		$run = new Run();
+		$run->projectId = $id;
+		$run->userId = $user->id;
+		$run->date = time();
+		$run->filename = $log_file;
+		$run->status = 'RUN';
+		$run->save();
+		$runid = implode(',', array_values($run->getPrimaryKey(true)));
+		$command = "$python $baseDir/app.py $id -r=$runid";
 
 		if (!file_exists($logDir)) {
 			mkdir($logDir, 0777, true);
 		}
 
-		$log = "$logDir/log_".date('Y_m_d\Th_i_s').".txt";
+		$log = "$logDir/$log_file";
 
 		$pid = $this->run_process($command, $log);
-		return $pid;
+
+		$run->id = $runid;
+		$run->exitcode = $pid;
+		$run->save();
+		return $run;
 	}
 
 	protected function run_process($cmd, $outputFile = '/dev/null', $append = false){

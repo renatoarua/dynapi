@@ -12,7 +12,7 @@ class m181027_235454_create_plan_table extends Migration
 	 */
 	public function up()
 	{
-		$this->createTable('plan', [
+		$this->createTable('pay_plan', [
 			'planId' => $this->primaryKey(),
 			'group' => $this->integer(11),
 			'code' => $this->integer(11),
@@ -27,6 +27,6 @@ class m181027_235454_create_plan_table extends Migration
 	 */
 	public function down()
 	{
-		$this->dropTable('plan');
+		$this->dropTable('pay_plan');
 	}
 }

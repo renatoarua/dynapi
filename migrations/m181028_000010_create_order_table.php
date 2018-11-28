@@ -1,6 +1,7 @@
 <?php
 
 use yii\db\Migration;
+// use yii\db\Schema;
 
 /**
  * Handles the creation of table `order`. (orderfact, relationship)
@@ -12,22 +13,26 @@ class m181028_000010_create_order_table extends Migration
    */
   public function up()
   {
-    $this->createTable('order', [
+    $this->createTable('pay_order', [
       'orderId' => $this->primaryKey(),
-      'date' => $this->integer(15),
+      'date' => $this->integer(11),
       'userId' => $this->integer(11),
       'planId' => $this->integer(11),
-      'paymentId' => $this->integer(11)
+      'paymentId' => $this->integer(11),
+      'costpertx' => $this->money(),
+      'price' => $this->money(),
+      'quantity' => $this->integer(11),
+      'total' => $this->integer(11)
     ]);
 
     /*$this->createIndex('idx-order-date', 'order', 'dateId');*/
-    $this->createIndex('idx-order-user', 'order', 'userId');
-    $this->createIndex('idx-order-plan', 'order', 'planId');
-    $this->createIndex('idx-order-payment', 'order', 'paymentId');
+    $this->createIndex('idx-order-user', 'pay_order', 'userId');
+    $this->createIndex('idx-order-plan', 'pay_order', 'planId');
+    $this->createIndex('idx-order-payment', 'pay_order', 'paymentId');
 
     /*$this->addForeignKey(
       'fk-order-date',
-      'order',
+      'pay_order',
       'dateId',
       'date',
       'dateId',
@@ -36,7 +41,7 @@ class m181028_000010_create_order_table extends Migration
 
     $this->addForeignKey(
       'fk-order-user',
-      'order',
+      'pay_order',
       'userId',
       'user',
       'id',
@@ -45,18 +50,18 @@ class m181028_000010_create_order_table extends Migration
 
     $this->addForeignKey(
       'fk-order-plan',
-      'order',
+      'pay_order',
       'planId',
-      'plan',
+      'pay_plan',
       'planId',
       'CASCADE'
     );
 
     $this->addForeignKey(
       'fk-order-payment',
-      'order',
+      'pay_order',
       'paymentId',
-      'payment',
+      'pay_info',
       'paymentId',
       'CASCADE'
     );
@@ -67,16 +72,16 @@ class m181028_000010_create_order_table extends Migration
    */
   public function down()
   {
-    // $this->dropForeignKey('fk-order-date', 'order');
-    $this->dropForeignKey('fk-order-plan', 'order');
-    $this->dropForeignKey('fk-order-user', 'order');
-    $this->dropForeignKey('fk-order-payment', 'order');
+    // $this->dropForeignKey('fk-order-date', 'pay_order');
+    $this->dropForeignKey('fk-order-plan', 'pay_order');
+    $this->dropForeignKey('fk-order-user', 'pay_order');
+    $this->dropForeignKey('fk-order-payment', 'pay_order');
 
-    // $this->dropIndex('idx-order-date', 'order');
-    $this->dropIndex('idx-order-plan', 'order');
-    $this->dropIndex('idx-order-user', 'order');
-    $this->dropIndex('idx-order-payment', 'order');
+    // $this->dropIndex('idx-order-date', 'pay_order');
+    $this->dropIndex('idx-order-plan', 'pay_order');
+    $this->dropIndex('idx-order-user', 'pay_order');
+    $this->dropIndex('idx-order-payment', 'pay_order');
 
-    $this->dropTable('order');
+    $this->dropTable('pay_order');
   }
 }

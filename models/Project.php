@@ -68,7 +68,7 @@ class Project extends \yii\db\ActiveRecord
     {
         $fields = parent::fields();
         $fields[] = 'machine';
-        $fields[] = 'user';
+        // $fields[] = 'user';
         $fields[] = 'projectsetting';
         return $fields;
     }

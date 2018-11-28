@@ -89,7 +89,8 @@ class Machine extends \yii\db\ActiveRecord
     public function afterFind()
     {
         parent::afterFind();
-        Yii::$app->converter->refresh();
+        // Yii::$app->converter->refresh();
+        
         if(!empty($this->sections))
             $this->sections = SciNotation::afterFindSections(json_decode($this->sections, true));
         if(!empty($this->discs))

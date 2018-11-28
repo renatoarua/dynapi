@@ -1,6 +1,6 @@
 <?php
 
-$params = require(__DIR__ . '/params.php');
+$params = include __DIR__ . '/params.php'; //$params = require(__DIR__ . '/params.php');
 
 $config = [
     'id' => 'dyntech',
@@ -28,6 +28,7 @@ $config = [
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
+            // 'viewPath' => '@common/mail',
             // send all mails to a file by default. You have to set
             // 'useFileTransport' to false and configure a transport
             // for the mailer to send real emails.
@@ -53,6 +54,22 @@ $config = [
                 'ping'  =>  'site/ping',
                 [
                     'class'         => 'yii\rest\UrlRule',
+                    'controller'    => 'v1/payment',
+                    'pluralize'     => false,
+                    'tokens' => [
+                        '{id}'      => '<id:\w+>',
+                        '{userId}'  => '<userId:\d+>',
+                    ],
+                    'extraPatterns' => [
+                        'OPTIONS {id}'         => 'options',
+                        'OPTIONS balance/{userId}'     => 'options',
+                        'GET index'            => 'index',
+                        'GET {id}'         => 'view',
+                        'GET balance/{userId}' => 'balance',
+                    ],
+                ],
+                [
+                    'class'         => 'yii\rest\UrlRule',
                     'controller'    => 'v1/project',
                     'pluralize'     => false,
                     'tokens' => [
@@ -75,13 +92,18 @@ $config = [
                     'pluralize'     => false,
                     'tokens' => [
                         '{id}'             => '<id:\w+>',
+                        '{runid}'          => '<runid:\d+>',
                     ],
                     'extraPatterns' => [
                         'OPTIONS {id}'       => 'options',
                         'GET execute'        => 'execute',
                         'OPTIONS execute'    => 'options',
-                        'GET change'        => 'change',
-                        'OPTIONS change'    => 'options',
+                        'GET change'         => 'change',
+                        'OPTIONS change'     => 'options',
+                        'POST log'           => 'log',
+                        'OPTIONS log'        => 'options',
+                        'GET status'         => 'status',
+                        'OPTIONS status'     => 'options',
                     ],
                 ],
                 [
@@ -142,10 +164,13 @@ $config = [
 	                'controller'    => 'v1/page',
 	                'pluralize'     => false,
 	                'tokens'        => [
+                        '{runId}'           => '<id:\d+>',
 	                ],
 	                'extraPatterns' => [
-		                'GET sse'       =>  'sse',
-		                'OPTIONS sse'    =>  'sse',
+                        'OPTIONS log {runId}'  =>  'options',
+                        'GET sse'       =>  'sse',
+                        'OPTIONS sse'    =>  'sse',
+                        'GET log'        => 'log',
 	                ]
                 ],
             ]
@@ -188,7 +213,8 @@ $config = [
         ],
         'converter' => [
             'class' => 'app\components\Converter',
-            'ratio' => 1000
+            'system' => 'si',
+            'ratio' => 1000,
         ]
 
     ],

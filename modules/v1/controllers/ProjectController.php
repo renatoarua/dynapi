@@ -115,10 +115,13 @@ class ProjectController extends RestController
 		/*for ($i=0; $i < 100; $i++) { 
 			echo RestUtils::generateId() . "<br>\n";
 		}
-		die();*/
-
+		die();
+		*/
 		Yii::$app->session->set('ratio', ($unit == 'm') ? 1 : 1000);
 		Yii::$app->converter->ratio = ($unit == 'm') ? 1 : 1000;
+		// Yii::$app->converter->system = $unit;
+		// var_dump(Yii::$app->converter->arr[$unit]['length']);
+		// die();
 
 		$project = Project::find()->where([
 			'projectId' => $id

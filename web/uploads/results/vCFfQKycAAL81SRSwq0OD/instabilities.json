@@ -5,7 +5,7 @@
                 "color": "#e6194b"
             },
             "mode": "lines",
-            "name": "Est_1",
+            "name": "Eig 1",
             "type": "scatter",
             "x": [
                 52.35987755982988,
@@ -419,7 +419,7 @@
                 "color": "#3cb44b"
             },
             "mode": "lines",
-            "name": "Est_2",
+            "name": "Eig 2",
             "type": "scatter",
             "x": [
                 52.35987755982988,
@@ -830,10 +830,10 @@
         },
         {
             "line": {
-                "color": "#ffe119"
+                "color": "#ed5b37"
             },
             "mode": "lines",
-            "name": "Est_3",
+            "name": "Eig 3",
             "type": "scatter",
             "x": [
                 52.35987755982988,
@@ -1244,10 +1244,10 @@
         },
         {
             "line": {
-                "color": "#0082c8"
+                "color": "#008080"
             },
             "mode": "lines",
-            "name": "Est_4",
+            "name": "Eig 4",
             "type": "scatter",
             "x": [
                 52.35987755982988,
@@ -1658,10 +1658,10 @@
         },
         {
             "line": {
-                "color": "#f58231"
+                "color": "#ee9a37"
             },
             "mode": "lines",
-            "name": "Est_5",
+            "name": "Eig 5",
             "type": "scatter",
             "x": [
                 52.35987755982988,
@@ -2072,10 +2072,10 @@
         },
         {
             "line": {
-                "color": "#911eb4"
+                "color": "#0082c8"
             },
             "mode": "lines",
-            "name": "Est_6",
+            "name": "Eig 6",
             "type": "scatter",
             "x": [
                 52.35987755982988,
@@ -2486,6 +2486,6 @@
         }
     ],
     "layout": {
-        "title": "Instabilities - 26, Oct 2018"
+        "title": "Instability Map - 28, Nov 2018"
     }
 }
