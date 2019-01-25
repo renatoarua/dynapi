@@ -78,7 +78,7 @@ class ProjectModel extends Model
 		// parent::load($data, 'project');
 		$this->project = $data['project'];
 		$this->projectsetting = $data['settings'];
-		$this->machine = $this->createMachine();
+		$this->machine = $this->createMachine($data);
 		$this->user = User::findIdentity($this->project->userId);
 
 		$this->projectsetting->projectId = '0L8qMKDBYWXb34IWwRtqg';
@@ -169,17 +169,13 @@ class ProjectModel extends Model
 
 		$pro->resultoptions = Json::encode([
 			'staticLine' => $model[5],
-			'fatigue' => $model[6],
-			'campbell' => $model[7],
+			'campbell' => $model[6],
+			'criticalMap' => $model[7],
 			'modes' => $model[8],
-			'criticalMap' => $model[9],
-			'unbalancedResponse' => $model[10],
-			'constantResponse' => $model[11],
-			'timeResponse' => $model[12],
-			'torsional' => $model[13],
-			'balanceOptimization' => $model[14],
-			'vesOptimization' => $model[15],
-			'absOptimization' => $model[16]
+			'unbalancedResponse' => $model[9],
+			'constantResponse' => $model[10],
+			'timeResponse' => $model[11],
+			'torsional' => $model[12]
 		]);
 
 		$pro->resultcampbell = Json::encode([]);
@@ -193,7 +189,7 @@ class ProjectModel extends Model
 		return $pro;
 	}
 
-	protected function createMachine()
+	protected function createMachine($model)
 	{
 		$maq = new Machine();
 		$maq->machineId = RestUtils::generateId();
@@ -207,6 +203,11 @@ class ProjectModel extends Model
         $maq->ves = Json::encode([]);
         $maq->abs = Json::encode([]);
         $maq->ldratio = '1.000000e+0';
+        $maq->rangeOptions = Json::encode([
+			"minSpeed" => $model['speedMin'],
+			"maxSpeed" => $model['speedMax'],
+			"maxAmplitude" => $model['ampMax'],
+		]);
 
 		return $maq;
 	}

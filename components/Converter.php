@@ -18,17 +18,36 @@ class Converter extends Component
 	public $arr = [
 		"si" => [
 			"m" => 'm',
-			"mm" => 'mm',
 			"pa" => 'pa',
 			"N" => 'N',
+			"Nm" => 'Nm',
 			"kg_m3" => "kg_m3",
+			"kg" => "kg",
+			"kgm2" => "kgm2",
+			"kgm" => "kgm",
+			"pas" => "pas",
+		],
+		"metric" => [
+			"m" => 'mm',
+			"pa" => 'pa',
+			"N" => 'N',
+			"Nm" => 'Nm',
+			"kg_m3" => "kg_m3",
+			"kg" => "kg",
+			"kgm2" => "kgm2",
+			"kgm" => "gmm",
+			"pas" => "pas",
 		],
 		"imperial" => [
-			"m" => 'ft',
-			"mm" => 'in',
+			"m" => 'in',
 			"pa" => 'psi',
-			"N" => 'lb',
-			"kg_m3" => "slug_ft3",
+			"N" => 'lbf',
+			"Nm" => 'lbfin',
+			"kg_m3" => "lb_ft3",
+			"kg" => "lb",
+			"kgm2" => "lbft2",
+			"kgm" => "ozin",
+			"pas" => "pas",
 		]
 	];
 
@@ -37,8 +56,8 @@ class Converter extends Component
 		$this->make(1, "m");
 	}
 
-	public function setSystem() {
-		$this->_system = "si";
+	public function setSystem($unit) {
+		$this->_system = $unit;
 	}
 
 	public function getSystem() {
@@ -66,6 +85,28 @@ class Converter extends Component
 
 	public function _to($unit, $decimals = null, $round = true) {
 		return $this->_convertor->from($unit, $decimals, $round);
+	}
+
+	public function from($value, $unit, $sci=true, $decimals = null, $round = true) {
+		if($unit == '1') {
+			$ret = (float)$value;
+		} else {
+			$this->_convertor->from((float)$value, $this->arr[$this->_system][$unit]);
+			$tounit = $unit;
+			$ret = $this->_convertor->to($tounit, $decimals, $round);
+		}
+		return $sci ? sprintf('%e', $ret) : $ret;
+	}
+
+	public function to($value, $unit, $sci=true, $decimals = null, $round = true) {
+		if($unit == '1') {
+			$ret = (float)$value;
+		} else {
+			$this->_convertor->from((float)$value, $unit);
+			$tounit = $this->arr[$this->_system][$unit];
+			$ret = $this->_convertor->to($tounit, $decimals, $round);
+		}
+		return $sci ? sprintf('%e', $ret) : $ret;
 	}
 
 	public function convert($value)

@@ -55,7 +55,6 @@ class MachineModel extends Model
 		}
 
 		try {
-
 			$tx = Yii::$app->db->beginTransaction();
 			//$this->user->save();
 			$this->project->save();

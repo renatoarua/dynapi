@@ -84,6 +84,7 @@ $config = [
                         'GET index {userId}' => 'index',
                         'GET view {unit}'    => 'view',
                         'GET {id}/{name}'    => 'chart',
+                        'PUT {id}/{unit}'    => 'update',
                     ],
                 ],
                 [
@@ -155,8 +156,11 @@ $config = [
                         '{id}'             => '<id:\d+>',
                     ],
                     'extraPatterns' => [
-                        'GET public'       =>  'public',
+                        'GET public'        =>  'public',
                         'OPTIONS public'    =>  'options',
+                        'GET me'            =>  'me',
+                        'POST me'           =>  'me-update',
+                        'OPTIONS me'        =>  'options',
                     ]
                 ],
                 [

@@ -21,7 +21,6 @@ use app\components\SciNotation;
  * @property Journalbearing[] $journalbearings
  * @property Project $project
  * @property Resultline[] $resultline
- * @property Ribs[] $ribs
  * @property Rollerbearing[] $rollerbearings
  * @property Section[] $sections
  * @property Ves[] $ves
@@ -43,11 +42,11 @@ class Machine extends \yii\db\ActiveRecord
     {
         return [
             [['machineId', 'projectId', 'ldratio'], 'required'],
-            [['sections', 'discs', 'ribs', 'rollerbearings', 'journalbearings', 'foundations', 'ves', 'abs'], 'string'],
+            [['sections', 'discs', 'rollerbearings', 'journalbearings', 'foundations', 'ves', 'abs'], 'string'],
             [['machineId', 'projectId'], 'string', 'max' => 21],
             [['ldratio'], 'string', 'max' => 15],
             [['machineId'], 'unique'],
-            [['machineId', 'projectId', 'ldratio', 'sections', 'discs', 'ribs', 'rollerbearings', 'journalbearings', 'foundations', 'ves', 'abs'], 'safe'],
+            [['machineId', 'projectId', 'ldratio', 'sections', 'discs', 'rollerbearings', 'journalbearings', 'foundations', 'ves', 'abs'], 'safe'],
             //[['projectId'], 'exist', 'skipOnError' => true, 'targetClass' => Project::className(), 'targetAttribute' => ['projectId' => 'projectId']],
         ];
     }
@@ -62,7 +61,6 @@ class Machine extends \yii\db\ActiveRecord
             'projectId' => Yii::t('app', 'Project ID'),
             'sections' => Yii::t('app', 'Sections'),
             'discs' => Yii::t('app', 'Discs'),
-            'ribs' => Yii::t('app', 'Ribs'),
             'rollerbearings' => Yii::t('app', 'Rollerbearings'),
             'journalbearings' => Yii::t('app', 'Journalbearings'),
             'foundations' => Yii::t('app', 'Foundations'),
@@ -77,7 +75,6 @@ class Machine extends \yii\db\ActiveRecord
         $this->ldratio = sprintf('%e', (float)$this->ldratio);
         $this->sections = json_encode(SciNotation::validateSections($this->sections));
         $this->discs = json_encode(SciNotation::validateDiscs($this->discs));
-        $this->ribs = json_encode(SciNotation::validateRibs($this->ribs));
         $this->rollerbearings = json_encode(SciNotation::validateRollerbearings($this->rollerbearings));
         $this->journalbearings = json_encode(SciNotation::validateJournalbearings($this->journalbearings));
         $this->foundations = json_encode(SciNotation::validateFoundations($this->foundations));
@@ -90,13 +87,10 @@ class Machine extends \yii\db\ActiveRecord
     {
         parent::afterFind();
         // Yii::$app->converter->refresh();
-        
         if(!empty($this->sections))
             $this->sections = SciNotation::afterFindSections(json_decode($this->sections, true));
         if(!empty($this->discs))
             $this->discs = SciNotation::afterFindDiscs(json_decode($this->discs, true));
-        if(!empty($this->ribs))
-            $this->ribs = SciNotation::afterFindRibs(json_decode($this->ribs, true));
         if(!empty($this->rollerbearings))
             $this->rollerbearings = SciNotation::afterFindRollerbearings(json_decode($this->rollerbearings, true));
         if(!empty($this->journalbearings))

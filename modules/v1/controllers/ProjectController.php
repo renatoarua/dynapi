@@ -22,6 +22,7 @@ use app\modules\v1\models\MachineModel;
 
 use yii\helpers\ArrayHelper;
 use app\components\RestUtils;
+use yii\helpers\Json;
 
 class ProjectController extends RestController
 {
@@ -87,12 +88,11 @@ class ProjectController extends RestController
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function actionIndex($unit = 'mm', $userId = null)
+	public function actionIndex($unit = 'metric', $userId = null)
 	{
-		Yii::$app->session->set('ratio', ($unit == 'm') ? 1 : 1000);
-		Yii::$app->converter->ratio = ($unit == 'm') ? 1 : 1000;
 		//$data = RestUtils::getQuery(\Yii::$app->request->get(), Project::find());
-		$models = array();
+		Yii::$app->converter->system = $unit;
+		$models = [];
 
 		if($userId) {
 			$models = Project::find()->where([
@@ -110,17 +110,17 @@ class ProjectController extends RestController
 	 * @return array|null|\yii\db\ActiveRecord
 	 * @throws NotFoundHttpException
 	 */
-	public function actionView($id, $unit = 'mm')
+	public function actionView($id, $unit = 'metric')
 	{
 		/*for ($i=0; $i < 100; $i++) { 
 			echo RestUtils::generateId() . "<br>\n";
 		}
 		die();
 		*/
-		Yii::$app->session->set('ratio', ($unit == 'm') ? 1 : 1000);
-		Yii::$app->converter->ratio = ($unit == 'm') ? 1 : 1000;
-		// Yii::$app->converter->system = $unit;
-		// var_dump(Yii::$app->converter->arr[$unit]['length']);
+
+		Yii::$app->converter->system = $unit;
+		// var_dump(Yii::$app->converter->from(1, 'm')); // 1 in = 2.540000e-2 m
+		// var_dump(Yii::$app->converter->to(1, 'm')); // 1 in = 3.937008e+1 m
 		// die();
 
 		$project = Project::find()->where([
@@ -130,11 +130,7 @@ class ProjectController extends RestController
 			'status' => 'ACT'
 		])*/
 
-		/*var_dump($project);
-		die();*/
-
 		if($project) {
-			// Yii::$app->session->set('ratio', 1000);
 			return $project;
 		} else {
 			throw new NotFoundHttpException("Object not found: $id");
@@ -175,6 +171,9 @@ class ProjectController extends RestController
 
 		$model->load($params, '');
 
+		// var_dump($model);
+		// die();
+
 		if ($model->validate() && $model->save()) {
 			$response = \Yii::$app->getResponse();
 			$response->setStatusCode(201);
@@ -196,12 +195,21 @@ class ProjectController extends RestController
 	 * @return array|null|\yii\db\ActiveRecord
 	 * @throws HttpException
 	 */
-	public function actionUpdate($id) {
+	public function actionUpdate($id, $unit='metric') {
+		Yii::$app->converter->system = $unit;
 		$params = \Yii::$app->getRequest()->getBodyParams();
 		$model = new MachineModel();
 		// $machineId = $params['machine']['machineId'];
 
+		// $unit = $params['unitsystem'];
+		// validating from chosen unit to si
+		Yii::$app->converter->system = $unit;
+
 		$model->update($id, $params);
+
+		// var_dump(Json::decode($model->machine->sections)[1]['ribs'][0]);
+		// var_dump(Json::decode($model->machine->journalbearings)[0]['optimization']);
+		// die();
 
 		if ($model->validate() && $model->save()) {
 			$response = \Yii::$app->getResponse();

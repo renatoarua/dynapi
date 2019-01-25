@@ -3,7 +3,9 @@
 namespace app\modules\v1\controllers;
 
 use app\filters\auth\HttpBearerAuth;
+use app\models\User;
 use app\models\Setting;
+use app\models\Usersetting;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\auth\CompositeAuth;
@@ -48,6 +50,7 @@ class SettingController extends ActiveController
                 'update' => ['put'],
                 'delete' => ['delete'],
                 'public' => ['get'],
+                'me' => ['get', 'post'],
             ],
         ];
 
@@ -79,6 +82,11 @@ class SettingController extends ActiveController
                     'allow' => true,
                     'actions' => ['index', 'view', 'create', 'update', 'delete'],
                     'roles' => ['admin', 'manageSettings'],
+                ],
+                [
+                    'allow' => true,
+                    'actions' => ['me'],
+                    'roles' => ['user']
                 ],
             ],
         ];
@@ -230,6 +238,63 @@ class SettingController extends ActiveController
         }
 
         return $publicSettings;
+    }
+
+    /**
+     * Return public settings
+     *
+     * @return array
+     */
+    public function actionMe()
+    {
+        $publicSettings = [];
+        $user = User::findIdentity(\Yii::$app->user->getId());
+
+        if ($user) {
+            $settings = Usersetting::find()
+                ->where([
+                    'userId' => $user,
+                    'status' => 1,
+                ])->all();
+
+            if ($settings) {
+                foreach ($settings as $settingKey => $setting) {
+                    $publicSettings[] = [
+                        'meta_key' => $setting->setting['meta_key'],
+                        'meta_type' => $setting->setting['meta_type'],
+                        'meta_value' => $setting['value']
+                    ];
+                }
+            }
+        }
+
+        return $publicSettings;
+    }
+
+    public function actionMeUpdate()
+    {
+        $user = User::findIdentity(\Yii::$app->user->getId());
+
+        if ($user) {
+            $model = new Usersetting();
+            $model->load(Yii::$app->request->post());
+            $model->id = $user->id;
+
+            if ($model->validate() && $model->save()) {
+                $response = \Yii::$app->getResponse();
+                $response->setStatusCode(200);
+
+                $responseData = 'true';
+
+                return $responseData;
+            } else {
+                // Validation error
+                throw new HttpException(422, json_encode($model->errors));
+            }
+        } else {
+            // Validation error
+            throw new NotFoundHttpException('Object not found');
+        }
     }
 
     /**
