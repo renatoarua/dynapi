@@ -256,13 +256,13 @@ class SciNotation
             });
             $dat[$i]['rotations'] = $rot;
 
-            if(isset($dat[$i]['optimization'])) {
+            if(isset($dat[$i]['optimization'][0])) {
                 // && $dat[$i]['optimization']['status'] != Journal::NOT_APPLICABLE
-                $dat[$i]['optimization']['viscosity'] = Yii::$app->converter->to(+$dat[$i]['optimization']['viscosity'], 'pas');
-                $dat[$i]['optimization']['diameter'] = Yii::$app->converter->to(+$dat[$i]['optimization']['diameter'], 'm');
-                $dat[$i]['optimization']['length'] = Yii::$app->converter->to(+$dat[$i]['optimization']['length'], 'm');
-                $dat[$i]['optimization']['radio'] = Yii::$app->converter->to(+$dat[$i]['optimization']['radio'], 'm');
-                $dat[$i]['optimization']['load'] = Yii::$app->converter->to(+$dat[$i]['optimization']['load'], 'N');
+                $dat[$i]['optimization'][0]['viscosity'] = Yii::$app->converter->to(+$dat[$i]['optimization'][0]['viscosity'], 'pas');
+                $dat[$i]['optimization'][0]['diameter'] = Yii::$app->converter->to(+$dat[$i]['optimization'][0]['diameter'], 'm');
+                $dat[$i]['optimization'][0]['length'] = Yii::$app->converter->to(+$dat[$i]['optimization'][0]['length'], 'm');
+                $dat[$i]['optimization'][0]['radio'] = Yii::$app->converter->to(+$dat[$i]['optimization'][0]['radio'], 'm');
+                $dat[$i]['optimization'][0]['load'] = Yii::$app->converter->to(+$dat[$i]['optimization'][0]['load'], 'N');
                 // $opt = $dat[$i]['optimization'];
                 // $dat[$i]['optimization'] = $opt;
             }
@@ -552,8 +552,8 @@ class SciNotation
 
         for ($i=0; $i < count($dat); $i++) {
             $dat[$i]['initialStiffness'] = sprintf('%e', (float)$dat[$i]['initialStiffness']);
-            $dat[$i]['initialSpeed'] = sprintf('%e', (float)$dat[$i]['initialSpeed']);
-            $dat[$i]['finalSpeed'] = sprintf('%e', (float)$dat[$i]['finalSpeed']);
+            $dat[$i]['initialSpin'] = sprintf('%e', (float)$dat[$i]['initialSpin']);
+            $dat[$i]['finalSpin'] = sprintf('%e', (float)$dat[$i]['finalSpin']);
             $dat[$i]['decades'] = sprintf('%e', (int)$dat[$i]['decades']);
             $dat[$i]['frequencies'] = sprintf('%e', (int)$dat[$i]['frequencies']);
         }
@@ -715,8 +715,8 @@ class SciNotation
             return [];
 
         for ($i=0; $i < count($dat); $i++) {
-            $dat[$i]['initialFrequency'] = sprintf('%e', (float)$dat[$i]['initialFrequency']);
-            $dat[$i]['finalFrequency'] = sprintf('%e', (float)$dat[$i]['finalFrequency']);
+            $dat[$i]['initialSpin'] = sprintf('%e', (float)$dat[$i]['initialSpin']);
+            $dat[$i]['finalSpin'] = sprintf('%e', (float)$dat[$i]['finalSpin']);
             $dat[$i]['modes'] = sprintf('%e', (int)$dat[$i]['modes']);
             $dat[$i]['steps'] = sprintf('%e', (int)$dat[$i]['steps']);
 

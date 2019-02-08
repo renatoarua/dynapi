@@ -1,0 +1,133 @@
+/*font-main: 'Roboto Mono',
+  font-secondary: monospace,
+  url-bg: url('/assets/img/background-large.jpg'),
+  url-bg-glow: url('/assets/img/glow.png'),
+
+  color-bg:            #106466,
+  color-fg:            #3fbbb0,
+
+  color-fg-highlight:  #18b797,
+
+  separator:           #1d435a,
+  color-gray:          #5c696f,
+  color-white:         #e3f7d2,
+
+  shadow: 0,
+  radius: 0,
+  layout-bg:           #2c3532,
+
+  tooltip-fg:          #e3f7d2,
+
+  color-primary:       #3fbbb0,
+  color-success:       #18b797,
+  color-info:          #4de2ff,
+  color-warning:       #ee9a37,
+  color-danger:        #ee5b37,
+
+  link-color:          #00f9a6,
+  link-color-hover:    #14ffbe,
+
+  scrollbar-fg:        #c8f6d2,
+  scrollbar-bg:        #106466,
+
+  layout-gradient: radial-gradient(circle at 50% 50%, #106466, #2c3532),
+  card-bg-gradient: linear-gradient(to bottom, rgba(22,50,61,0.9) 0%,rgba(1,1,1,0.85) 30%,rgba(1,1,1,0.75) 50%,rgba(1,1,1,0.85) 70%,rgba(22,50,61,0.9) 100%),
+  card-bg-gradient: linear-gradient(to bottom, rgba(16, 100, 102, 0.7) 0%, rgba(44,53,50,0.8) 30%, rgba(44,53,50,0.6) 50%, rgba(44,53,50,0.7) 70%, rgba(16, 100, 102, 0.7) 100%),
+  card-bg-gradient-reverse: linear-gradient(to bottom, rgba(227, 247, 210, 0.7) 0%, rgba(227, 247, 210,0.5) 30%, rgba(227, 247, 210,0.3) 50%, rgba(227, 247, 210,0.5) 70%, rgba(227, 247, 210, 0.7) 100%),
+
+  success-linear: linear-gradient(to bottom, rgba(#e3f7d2, 0.7) 0%, rgba(#3eceb2, 0.7) 100%),
+  success-linear-reverse: linear-gradient(to bottom, rgba(#3eceb2, 0.7) 0%, rgba(#e3f7d2, 0.7) 100%),
+
+  form-control-bg: #106466,
+  form-control-focus-bg: #106466,
+
+  card-fg: #3fbbb0,
+  color-fg-text: #3fbbb0,
+  color-fg-heading: #3fbbb0,
+  sidebar-header-gap: 2rem,*/
+
+body {
+  background: #106466;
+  background: url('../img/glow.png') repeat center top;
+  background-attachment: fixed;
+}
+body::before {
+  content: '';
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: url('../img/background-large.jpg') no-repeat center center;
+  background-size: cover;
+  will-change: transform;
+  z-index: -1;
+}
+
+.wrap .container {
+  transition: width 0.3s ease;
+  overflow: hidden;
+  margin: 0;
+  width: 100%;
+}
+
+.col-sm-12 {
+  margin-bottom: 30px;
+}
+
+.card {
+  background: linear-gradient(to bottom, rgba(16, 100, 102, 0.7) 0%, rgba(44,53,50,0.8) 30%, rgba(44,53,50,0.6) 50%, rgba(44,53,50,0.7) 70%, rgba(16, 100, 102, 0.7) 100%);
+  border: 2px solid #106466;
+  padding: 10px;
+}
+
+.card-header {
+  border: unset;
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #e3f7d2;
+}
+
+.result-card {
+  display: block;
+}
+
+.result-card .value {
+  padding: 0;
+  width: 48%;
+  border: 1px solid #3fbbb0;
+  margin: 0 3px 3px 0;
+  float: left;
+}
+.result-card .value p {
+  color: #ddd;
+  padding: 3px 0 1px 2px;
+  margin-bottom: 0.2rem;
+  font-size: .7vw;
+  text-align: center;
+}
+
+span.line {
+  width: 10px;
+  height: 10px;
+  float: right;
+  border-radius: 50%;
+}
+
+.result-card .value p:nth-of-type(2) {
+  font-size: 1.5em;
+  color: black;
+  background-color: #3fbbb0;
+  width: 100%;
+  padding: 1px 3px;
+  text-align: right;
+  margin-bottom: 0;
+  text-align: right;
+}
+.result-card .value p:nth-of-type(3) {
+  font-size: 1.5em;
+  font-weight: bolder;
+  color: #3fbbb0;
+  text-align: right;
+  padding-right: 3px;
+}

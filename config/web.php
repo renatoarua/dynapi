@@ -77,6 +77,8 @@ $config = [
                         '{userId}'  => '<userId:\d+>',
                         '{unit}'    => '<unit:\w+>',
                         '{name}'    => '<name:\w+>',
+                        '{jid}'     => '<jid:\w+>',
+                        '{cid}'     => '<cid:\w+>',
                     ],
                     'extraPatterns' => [
                         'OPTIONS {id}'       => 'options',
@@ -85,6 +87,8 @@ $config = [
                         'GET view {unit}'    => 'view',
                         'GET {id}/{name}'    => 'chart',
                         'PUT {id}/{unit}'    => 'update',
+                        'POST {jid}/journal' => 'set-journal',
+                        'GET report'   => 'report',
                     ],
                 ],
                 [

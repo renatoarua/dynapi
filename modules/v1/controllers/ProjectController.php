@@ -24,6 +24,8 @@ use yii\helpers\ArrayHelper;
 use app\components\RestUtils;
 use yii\helpers\Json;
 
+use Mpdf\Mpdf;
+
 class ProjectController extends RestController
 {
 	public $modelClass = 'app\models\Project';
@@ -52,6 +54,8 @@ class ProjectController extends RestController
 				'create' => ['post'],
 				'update' => ['put'],
 				'delete' => ['delete'],
+				'set-journal' => ['post'],
+				'report' => ['get'],
 			],
 		];
 				//'getPermissions'    =>  ['get'],
@@ -62,7 +66,7 @@ class ProjectController extends RestController
 		// setup access
 		$behaviors['access'] = [
 			'class' => AccessControl::className(),
-			'only' => ['index', 'view', 'chart', 'create', 'update', 'delete'], //only be applied to
+			'only' => ['index', 'view', 'chart', 'set-journal', 'report', 'create', 'update', 'delete'], //only be applied to
 			'rules' => [
 				[
 					'allow' => true,
@@ -70,12 +74,14 @@ class ProjectController extends RestController
 					'roles' => ['admin', 'manageStaffs'],
 				],
 				[
-					'actions' => ['index', 'view', 'chart'],
+					'actions' => ['index', 'view', 'chart', 'set-journal', 'report'],
 					'allow' => true,
 				],
 			],
 		];
 
+		$behaviors['authenticator']['except'][] = 'report';
+		$behaviors['authenticator']['except'][] = 'set-journal';
 		$behaviors['authenticator']['except'][] = 'chart';
 		$behaviors['authenticator']['except'][] = 'view';
 		$behaviors['authenticator']['except'][] = 'index';
@@ -220,6 +226,53 @@ class ProjectController extends RestController
 		}
 
 		return $this->actionView($id);
+	}
+
+	public function actionSetJournal($jid) {
+		$params = \Yii::$app->getRequest()->getBodyParams();
+		var_dump($params);
+		die();
+	}
+
+	public function actionReport($cid) {
+		$basePath = Yii::getAlias('@results');
+		$path = $basePath."/$cid/";
+		$project = $this->actionView($cid);
+
+		if($project) {
+			$this->layout = '@app/views/layouts/report';
+			\Yii::$app->response->format = \yii\web\Response::FORMAT_HTML;
+
+
+			$html = $this->render('@app/views/site/report', [
+				'id' => $cid,
+				'path' => $path,
+				'project' => $project
+			]);
+
+			// preg_match('#(image/png)#', $html, $results);
+			// var_dump($results);
+			// die();
+			return $html;
+
+			// $mpdf->imageVars['myvariable'] = file_get_contents('alpha.png');
+			// $html = '<img src="var:myvariable" />';
+
+
+
+			/*$mpdf = new Mpdf([
+				'mode' => 'utf-8',
+				'format' => 'A4',
+				'img_dpi' => 96,
+				'dpi' => 300,
+			]);
+			$mpdf->WriteHTML($html, 0);
+			$mpdf->Output('report.pdf','F');
+			exit;*/
+
+		} else {
+			throw new NotFoundHttpException("Object not found: $cid");
+		}
 	}
 
 	/**

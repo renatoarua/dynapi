@@ -36,7 +36,6 @@ body {
     font-style: italic;
 }
 
-/* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     position: relative;
     top: 1px;
@@ -49,11 +48,11 @@ a.asc:after, a.desc:after {
 }
 
 a.asc:after {
-    content: /*"\e113"*/ "\e151";
+    content: "\e151";
 }
 
 a.desc:after {
-    content: /*"\e114"*/ "\e152";
+    content: "\e152";
 }
 
 .sort-numerical a.asc:after {
@@ -90,7 +89,6 @@ a.desc:after {
     margin: 0 0 15px 0;
 }
 
-/* align the logout "link" (button in form) of the navbar */
 .nav li > form > button.logout {
     padding: 15px;
     border: none;
