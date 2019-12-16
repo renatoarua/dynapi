@@ -2,11 +2,11 @@
 
 namespace app\modules\v1\controllers;
 
-use app\filters\auth\HttpBearerAuth;
 use app\models\LoginForm;
 use app\models\User;
 use app\models\UserSearch;
 use Yii;
+use app\filters\auth\HttpBearerAuth;
 use yii\base\InvalidConfigException;
 use yii\filters\AccessControl;
 use yii\filters\auth\CompositeAuth;
@@ -17,6 +17,8 @@ use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
+
+use app\components\Notification;
 
 class StaffController extends ActiveController
 {
@@ -54,6 +56,7 @@ class StaffController extends ActiveController
                 'delete' => ['delete'],
                 'login' => ['post'],
                 'getPermissions' => ['get'],
+                'notify' => ['post'],
             ],
         ];
 
@@ -111,6 +114,19 @@ class StaffController extends ActiveController
         }
 
         return $search->getDataProvider();
+    }
+
+    // $message was just created by the logged in user, and sent to $recipient_id
+    /*Notification::notify(Notification::KEY_NEW_MESSAGE, $recipient_id, $message->id);
+
+    // You may also use the following static methods to set the notification type:
+    Notification::warning(Notification::KEY_NEW_MESSAGE, $recipient_id, $message->id);
+    Notification::success(Notification::ORDER_PLACED, $admin_id, $order->id);
+    Notification::error(Notification::KEY_NO_DISK_SPACE, '1234acanidqo1');
+    */
+    public function actionNotify()
+    {
+        Notification::notify(Notification::KEY_OFFER_TRADED, Yii::$app->user->identity->id, 'TDh7O1NJPqfCgoECYnEau');
     }
 
     /**
@@ -314,6 +330,7 @@ class StaffController extends ActiveController
             $user = $model->getUser();
             $user->generateAccessTokenAfterUpdatingClientInfo(true);
 
+
             $response = \Yii::$app->getResponse();
             $response->setStatusCode(200);
             $id = implode(',', array_values($user->getPrimaryKey(true)));
@@ -324,6 +341,7 @@ class StaffController extends ActiveController
                 'picture' => $user->picture
             ];
 
+            Notification::notify(Notification::KEY_OFFER_TRADED, Yii::$app->user->identity->id, 'TDh7O1NJPqfCgoECYnEau');
             return $responseData;
         } else {
             // Validation error

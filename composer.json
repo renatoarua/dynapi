@@ -22,7 +22,8 @@
         "odannyc/yii2-sse": "^0.1.0",
         "c006/yii2-migration-utility": "dev-master",
         "bitpay/php-client": "~2.2",
-        "mpdf/mpdf": "^7.1"
+        "mpdf/mpdf": "^7.1",
+        "machour/yii2-notification": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

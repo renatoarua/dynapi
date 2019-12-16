@@ -2,8 +2,9 @@
 
 namespace app\models;
 
+use Yii;
 use yii\base\Model;
-
+use app\models\User;
 /**
  * Signup Confirm form
  */
@@ -11,6 +12,7 @@ class SignupConfirmForm extends Model
 {
     public $id;
     public $auth_key;
+    public $plan = 1;
     /** @var User */
     private $_user = false;
 
@@ -25,7 +27,7 @@ class SignupConfirmForm extends Model
             [
                 'id',
                 'exist',
-                'targetClass' => '\app\models\User',
+                'targetClass' => 'app\models\User',
                 'filter' => [
                     'and',
                     ['status' => User::STATUS_PENDING],
@@ -38,12 +40,15 @@ class SignupConfirmForm extends Model
             [
                 'auth_key',
                 'exist',
-                'targetClass' => '\app\models\User',
+                'targetClass' => 'app\models\User',
                 'message' => 'The auth key is not valid.',
                 'filter' => function ($query) {
                     $query->andWhere(['status' => User::STATUS_PENDING])
                         ->andWhere(['id' => $this->id])
                         ->andWhere('confirmed_at IS NULL');
+                    // var_dump($query->createCommand()->rawsql);
+                    // $res = $query->all();
+                    // return count($res) > 0;
                 }
             ]
         ];
@@ -57,13 +62,15 @@ class SignupConfirmForm extends Model
     public function confirm()
     {
         if ($this->validate()) {
-            $this->getUserByID();
+            $user = $this->getUserByID();
 
             // fill confirmed_at
-            $this->_user->confirmEmail();
+            $user->confirmEmail();
 
             // generate access token
-            $this->_user->generateAccessTokenAfterUpdatingClientInfo(true);
+            $user->generateAccessTokenAfterUpdatingClientInfo(true);
+
+            $user->generateTrialOrder($this->plan);
 
             // Send confirmation email
             $this->sendSignupSuccessEmail();
@@ -90,19 +97,13 @@ class SignupConfirmForm extends Model
     public function sendSignupSuccessEmail()
     {
         $data = [];
-        $data["username"] = $this->name;
+        $data["username"] = $this->_user->username;
         $data["appName"] = Yii::$app->name;
         $data["loginURL"] = Yii::$app->params['backendURL'] . '#/login';
         $data["disclaimer"] = "'You can reach us at support@dyntechnologies.com.br with any doubt.'";
 
         $loginURL = Yii::$app->params['backendURL'] . '#/login';
 
-        Yii::$app->mailer->compose()
-                ->setTo($email)
-                ->setFrom([$this->email => $this->name])
-                ->setSubject($this->subject)
-                ->setTextBody($this->body)
-                ->send();
         $email = \Yii::$app->mailer
             ->compose(
                 ['html' => 'signup-success-html'],
@@ -111,7 +112,7 @@ class SignupConfirmForm extends Model
                 ]
             )
             ->setTo($this->_user->email)
-            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+            ->setFrom([Yii::$app->params['supportEmail'] => $data['appName']])
             ->setSubject('Signup completed')
             ->send();
 

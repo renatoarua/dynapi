@@ -649,6 +649,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         }
         $this->registration_ip = Yii::$app->request->userIP;
         $this->status = self::STATUS_ACTIVE;
+        $this->role = self::ROLE_STAFF;
         $this->save(false);
         $this->touch('confirmed_at');
 
@@ -878,6 +879,30 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function getOrders()
     {
         return $this->hasMany(PayOrder::className(), ['userId' => 'id']);
+    }
+
+    public function generateTrialOrder($plan) {
+        $model = new PayOrder();
+        $model->date = time();// strtotime(date('Y-m-d h:i:s'));
+        $model->userId = $this->id;
+        $model->planId = $plan;
+        $model->costpertx = 1;
+        $model->price = 0;
+        $model->quantity = 1;
+        $model->total = 0;
+        if($model->save()) {
+            $oid = implode(',', array_values($model->getPrimaryKey(true)));
+            $entry = new PayLedger();
+            // check balance, pay the robot or in the execute
+            $entry->actionId = 1;
+            $entry->sellerId = 4;
+            $entry->buyerId = $this->id;
+            $entry->tokenId = 'DYN';
+            $entry->date = time();
+            $entry->amount = 5;
+            $entry->save();
+        }
+
     }
 
     public function getCredit()

@@ -12,6 +12,7 @@ use app\models\SignupForm;
 use app\models\User;
 use app\models\UserEditForm;
 use app\models\UserSearch;
+use app\models\ContactForm;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\auth\CompositeAuth;
@@ -85,7 +86,9 @@ class UserController extends ActiveController
             'confirm',
             'password-reset-request',
             'password-reset-token-verification',
-            'password-reset'
+            'password-reset',
+            'contact',
+            'create-ticket'
         ];
 
         // setup access
@@ -246,7 +249,8 @@ class UserController extends ActiveController
     {
         $model = new LoginForm();
         $model->roles = [
-            User::ROLE_USER,
+            User::ROLE_STAFF,
+            User::ROLE_ADMIN,
         ];
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             $user = $model->getUser();
@@ -305,10 +309,14 @@ class UserController extends ActiveController
      */
     public function actionConfirm()
     {
+        $params = Yii::$app->request->post();
         $model = new SignupConfirmForm();
+        $model->load($params);
+        /*$model->validate();
+        var_dump($model->errors);
+        die();*/
 
-        $model->load(Yii::$app->request->post());
-        if ($model->validate() && $model->confirm()) {
+        if ($model->confirm()) {
             $response = \Yii::$app->getResponse();
             $response->setStatusCode(200);
 
@@ -395,6 +403,42 @@ class UserController extends ActiveController
             // Validation error
             throw new HttpException(422, json_encode($model->errors));
         }
+    }
+
+    /**
+     * Process contact
+     *
+     * @return string
+     * @throws HttpException
+     */
+    public function actionContact()
+    {
+        $model = new ContactForm();
+        $model->load(Yii::$app->request->post());
+
+        if ($model->validate() && $model->contact()) {
+            $response = \Yii::$app->getResponse();
+            $response->setStatusCode(200);
+            $responseData = 'ok';
+            return $responseData;
+        } else {
+            // Validation error
+            throw new HttpException(422, json_encode('Cannot send email'));
+        }
+
+    }
+
+    /**
+     * Process ticket creation
+     *
+     * @return string
+     * @throws HttpException
+     */
+    public function actionCreateTicket()
+    {
+        $params = Yii::$app->request->post();
+
+        
     }
 
     /**

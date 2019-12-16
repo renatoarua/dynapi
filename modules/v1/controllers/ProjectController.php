@@ -70,11 +70,11 @@ class ProjectController extends RestController
 			'rules' => [
 				[
 					'allow' => true,
-					'actions' => ['create', 'update', 'delete'],
+					'actions' => ['delete'],
 					'roles' => ['admin', 'manageStaffs'],
 				],
 				[
-					'actions' => ['index', 'view', 'chart', 'set-journal', 'report'],
+					'actions' => ['create', 'update', 'index', 'view', 'chart', 'set-journal', 'report'],
 					'allow' => true,
 				],
 			],
@@ -97,6 +97,7 @@ class ProjectController extends RestController
 	public function actionIndex($unit = 'metric', $userId = null)
 	{
 		//$data = RestUtils::getQuery(\Yii::$app->request->get(), Project::find());
+
 		Yii::$app->converter->system = $unit;
 		$models = [];
 
@@ -230,7 +231,10 @@ class ProjectController extends RestController
 
 	public function actionSetJournal($jid) {
 		$params = \Yii::$app->getRequest()->getBodyParams();
+		$model = $this->actionView($jid);
+
 		var_dump($params);
+		// ['speed', 'kxx', 'kxz', 'kzx' 'kzz', 'cxx', 'cxz', 'czx', 'czz']
 		die();
 	}
 

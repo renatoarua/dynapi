@@ -160,22 +160,22 @@ class ProjectModel extends Model
 		$pro->projectId = RestUtils::generateId();
 
 		$pro->systemoptions = Json::encode([
-			'rollerbearing' => $model[1],
-			'journalbearing' => $model[2],
-			'foundation' => $model[0],
-			'ves' => $model[3],
-			'abs' => $model[4]
+			'rollerbearing' => $model[0],
+			'journalbearing' => $model[1],
+			'foundation' => $model[2],
+			// 'ves' => $model[3],
+			// 'abs' => $model[4]
 		]);
 
 		$pro->resultoptions = Json::encode([
-			'staticLine' => $model[5],
-			'campbell' => $model[6],
-			'criticalMap' => $model[7],
-			'modes' => $model[8],
-			'unbalancedResponse' => $model[9],
-			'constantResponse' => $model[10],
-			'timeResponse' => $model[11],
-			'torsional' => $model[12]
+			'staticLine' => $model[3],
+			'campbell' => $model[4],
+			'criticalMap' => $model[5],
+			'modes' => $model[6],
+			'unbalancedResponse' => $model[7],
+			'constantResponse' => $model[8],
+			'timeResponse' => $model[9],
+			'torsional' => $model[10]
 		]);
 
 		$pro->resultcampbell = Json::encode([]);
@@ -196,7 +196,6 @@ class ProjectModel extends Model
 
 		$maq->sections = Json::encode([]);
         $maq->discs = Json::encode([]);
-        $maq->ribs = Json::encode([]);
         $maq->rollerbearings = Json::encode([]);
         $maq->journalbearings = Json::encode([]);
         $maq->foundations = Json::encode([]);

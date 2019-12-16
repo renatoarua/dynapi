@@ -4,6 +4,7 @@ $params = include __DIR__ . '/params.php'; //$params = require(__DIR__ . '/param
 
 $config = [
     'id' => 'dyntech',
+    'name' => 'RotorDYN',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'components' => [
@@ -32,7 +33,16 @@ $config = [
             // send all mails to a file by default. You have to set
             // 'useFileTransport' to false and configure a transport
             // for the mailer to send real emails.
-            'useFileTransport' => true,
+            // 'useFileTransport' => true,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.gmail.com',
+                'username' => 'dyntech@dyntechnologies.com.br',
+                'password' => 'main_dyntech@280910',
+                'port' => '465',
+                'encryption' => 'ssl',
+                'streamOptions' => [ 'ssl' => [ 'allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false ] ]
+            ]
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -51,6 +61,22 @@ $config = [
             'enableStrictParsing' => true,
             'rules' => [
                 //'utility' => 'utility/default/index',
+                [
+                    'class'         => 'yii\rest\UrlRule',
+                    'controller'    => 'notifications/notifications',
+                    'pluralize'     => false,
+                     'tokens' => [
+                        '{id}'      => '<id:\w+>',
+                    ],
+                    'extraPatterns' => [
+                        'OPTIONS {id}'         => 'options',
+                        'OPTIONS getNotification/{id}'     => 'options',
+                        'GET index' => 'index',
+                        'GET poll' => 'poll',
+                        'GET read' => 'read',
+                        'GET {id}' => 'getNotification',
+                    ],
+                ],
                 'ping'  =>  'site/ping',
                 [
                     'class'         => 'yii\rest\UrlRule',
@@ -132,6 +158,10 @@ $config = [
 		                'OPTIONS password-reset-token-verification'    =>  'options',
 		                'POST password-reset'       =>  'password-reset',
 		                'OPTIONS password-reset'    =>  'options',
+                        'POST contact'       =>  'contact',
+                        'OPTIONS contact'    =>  'options',
+                        'POST create-ticket'       =>  'create-ticket',
+                        'OPTIONS create-ticket'    =>  'options',
 		                'GET me'            =>  'me',
 		                'POST me'           =>  'me-update',
 		                'OPTIONS me'        =>  'options',
@@ -229,6 +259,22 @@ $config = [
     'modules' => [
         'v1' => [
             'class' => 'app\modules\v1\Module',
+        ],
+        'notifications' => [
+            'class' => 'machour\yii2\notifications\NotificationsModule',
+            // Point this to your own Notification class
+            // See the "Declaring your notifications" section below
+            'notificationClass' => 'app\components\Notification',
+            // Allow to have notification with same (userId, key, keyId)
+            // Default to FALSE
+            'allowDuplicate' => false,
+            // This callable should return your logged in user Id
+            'userId' => function() {
+                return 1; //\Yii::$app->user->identity->id;
+            },
+            'userGroup' => function() {
+                return 99; //\Yii::$app->user->identity->role;
+            },
         ],
         /*'utility' => [
             'class' => 'c006\utility\migration\Module',

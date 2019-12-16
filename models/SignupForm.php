@@ -68,7 +68,7 @@ class SignupForm extends Model
             $user->username = strtolower($this->username);
             $user->email = $this->email;
             $user->unconfirmed_email = $this->email;
-            $user->role = User::ROLE_USER;
+            $user->role = User::ROLE_STAFF;
             $user->status = User::STATUS_PENDING;
             $user->picture = "assets/img/avatars/1.jpg";
             $user->setPassword($this->password);
@@ -104,12 +104,12 @@ class SignupForm extends Model
     public function sendConfirmationEmail()
     {
         $data = [];
-        $data["confirmURL"] = \Yii::$app->params['backendURL'] . '#/confirm?id=' . $this->_user->id . '&auth_key=' . $this->_user->auth_key;
+        $data["confirmURL"] = \Yii::$app->params['backendURL'] . '#/auth/confirm?id=' . $this->_user->id . '&auth_key=' . $this->_user->auth_key;
         $data["appName"] = \Yii::$app->name;
         $data["username"] = $this->_user->username;
-        $data["disclaimer"] = "'You can reach us at support@dyntechnologies.com.br with any doubt.'";
+        $data["disclaimer"] = "'You can reach us at support@dyntechnologies.net with any doubt.'";
 
-        $email = \Yii::$app->mailer
+        $mail = \Yii::$app->mailer
             ->compose(
                 ['html' => 'signup-confirmation-html'],
                 [
@@ -117,10 +117,10 @@ class SignupForm extends Model
                 ]
             )
             ->setTo($this->email)
-            ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])
+            ->setFrom([\Yii::$app->params['noreplyEmail'] => \Yii::$app->name])
             ->setSubject('Signup confirmation')
             ->send();
 
-        return $email;
+        return $mail;
     }
 }

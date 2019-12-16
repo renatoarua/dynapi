@@ -12,12 +12,13 @@ $paginationParams = [
 
 return [
     'name' => 'DYN Technologies',
-    'frontendURL' => 'http://localhost/frontend/',
-    'backendURL' => 'http://localhost/backend/',
+    'frontendURL' => 'http://www.dyntechnologies.net',
+    'backendURL' => 'http://rotordyn.dyntechnologies.net',
 
-    'adminEmail' => 'eduardo@dyntechnologies.com.br',
-    'supportEmail' => 'brunoscholz@yahoo.de',
-    'contactEmail' => 'contact@dyntechnologies.com.br',
+    'adminEmail' => 'dyntech@dyntechnologies.com.br',
+    'supportEmail' => 'support@dyntechnologies.net',
+    'contactEmail' => 'contact@dyntechnologies.net',
+    'noreplyEmail' => 'noreply@dyntechnologies.net',
 
     'jwtSecretCode' => 'someSecretKey',
     'user.passwordResetTokenExpire' => 3600,
