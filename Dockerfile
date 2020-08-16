@@ -92,7 +92,7 @@ ENV VERSION_COMPOSER_ASSET_PLUGIN=^1.4.2 \
     COMPOSER_ALLOW_SUPERUSER=1
 
 # Add configuration files
-COPY image-files/ /
+# COPY image-files/ /
 
 # Add GITHUB_API_TOKEN support for composer
 

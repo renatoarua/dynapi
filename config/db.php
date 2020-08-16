@@ -2,8 +2,8 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=dyntech',
+    'dsn' => 'mysql:host=mysql;dbname=dyntech',
     'username' => 'root',
-    'password' => '',
+    'password' => 'MySql2019!',
     'charset' => 'utf8',
 ];

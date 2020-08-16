@@ -23,7 +23,7 @@
         "c006/yii2-migration-utility": "dev-master",
         "bitpay/php-client": "~2.2",
         "mpdf/mpdf": "^7.1",
-        "machour/yii2-notification": "@dev"
+        "machour/yii2-notifications": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
